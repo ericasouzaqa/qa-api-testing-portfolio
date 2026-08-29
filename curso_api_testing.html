@@ -2,1267 +2,247 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Curso local de testes de API com fundamentos, Postman, JavaScript, Swagger/OpenAPI, Cypress e boas práticas." />
-    <title>Curso de testes de API — Postman + Cypress</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Trilha local e progressiva para aprender testes de API, Postman, JavaScript, Swagger/OpenAPI, Cypress e automação." />
+    <title>Trilha de testes de API — QA</title>
     <style>
       :root {
-        --bg: #14181c;
-        --surface: #1c2228;
-        --surface-raised: #232a31;
-        --line: #333b43;
-        --text: #e8e6df;
-        --text-dim: #9aa3ab;
+        --bg: #10161a;
+        --surface: #192229;
+        --surface-raised: #202c33;
+        --line: #33424a;
+        --text: #f1efe8;
+        --text-dim: #a7b1b4;
+        --text-faint: #78858a;
         --amber: #d4a537;
-        --amber-dim: #3a331e;
-        --teal: #4a7a6f;
-        --teal-dim: #1e2c29;
-        --brick: #b65c4a;
-        --brick-dim: #31201c;
-        --violet: #7c6fa8;
-        --violet-dim: #241f35;
-        --blue: #3a6fa8;
-        --blue-dim: #1a2535;
+        --amber-bright: #f1c652;
+        --amber-dim: #3b321a;
+        --teal: #74ab98;
+        --teal-dim: #19332d;
+        --blue: #91b4cf;
+        --violet: #a99bd8;
+        --violet-dim: #282342;
+        --brick: #d27e6b;
+        --brick-dim: #3a211d;
+        --mono: 'IBM Plex Mono', Consolas, monospace;
+        --sans: 'IBM Plex Sans', Inter, system-ui, sans-serif;
+        --display: 'Space Grotesk', 'IBM Plex Sans', Inter, system-ui, sans-serif;
       }
-      * {
-        box-sizing: border-box;
-      }
-      html,
-      body {
-        margin: 0;
-        padding: 0;
-        background: transparent;
-        color: var(--text);
-        height: 100%;
-      }
-      body {
-        font-family: 'IBM Plex Sans', sans-serif;
-        font-size: 14px;
-        line-height: 1.6;
-      }
-      .shell {
-        display: flex;
-        flex-direction: column;
-        min-height: 100%;
-      }
-      .app {
-        display: grid;
-        grid-template-columns: 300px 1fr;
-        gap: 0;
-        background: var(--bg);
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        overflow: hidden;
-        flex: 1;
-      }
-      body.standalone {
-        background: radial-gradient(circle at 15% 10%, #1c232b, var(--bg) 55%);
-        min-height: 100vh;
-      }
-      body.standalone .shell {
-        min-height: 100vh;
-        max-width: 1280px;
-        margin: 0 auto;
-        padding: 28px 20px;
-      }
-      body.standalone .app {
-        min-height: calc(100vh - 56px);
-        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
-      }
-      .back-home {
-        display: inline-flex;
-        align-items: center;
-        margin-bottom: 12px;
-        color: var(--text-dim);
-        font-size: 12px;
-        text-decoration: none;
-      }
-      .back-home:hover {
-        color: var(--text);
-      }
+
+      * { box-sizing: border-box; }
+      html, body { min-height: 100%; margin: 0; background: var(--bg); color: var(--text); }
+      body { font-family: var(--sans); font-size: 14px; line-height: 1.6; }
+      a { color: inherit; }
+      a:focus-visible, button:focus-visible { outline: 3px solid var(--amber-bright); outline-offset: 3px; }
+      .shell { display: flex; min-height: 100vh; flex-direction: column; }
+      .back-home { width: min(1280px, calc(100% - 40px)); margin: 20px auto 10px; color: var(--text-dim); font-size: 12px; text-decoration: none; }
+      .back-home:hover { color: var(--text); }
+      .app { display: grid; grid-template-columns: 300px minmax(0, 1fr); width: min(1280px, calc(100% - 40px)); min-height: calc(100vh - 92px); margin: 0 auto; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); box-shadow: 0 30px 80px rgba(0,0,0,.35); }
+      .sidebar { overflow-y: auto; border-right: 1px solid var(--line); background: var(--surface); }
+      .brand { display: flex; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 2; padding: 18px 16px 13px; border-bottom: 1px solid var(--line); background: var(--surface); font-family: var(--display); font-weight: 700; }
+      .brand-mark { display: inline-grid; width: 24px; height: 24px; place-items: center; border: 1px solid var(--amber); border-radius: 6px; color: var(--amber-bright); font-family: var(--mono); font-size: 10px; }
+      .overall-progress { padding: 13px 16px 15px; border-bottom: 1px solid var(--line); }
+      .progress-label { display: flex; justify-content: space-between; margin-bottom: 6px; color: var(--text-dim); font-size: 11px; }
+      .bar { height: 5px; overflow: hidden; border-radius: 4px; background: var(--surface-raised); }
+      .bar-fill { height: 100%; background: var(--amber); transition: width .2s ease-out; }
+      .button { border: 1px solid var(--line); border-radius: 6px; background: var(--surface-raised); color: var(--text); cursor: pointer; font: 600 13px var(--sans); padding: 9px 13px; }
+      .button:hover { border-color: var(--text-dim); }
+      .button.primary { border-color: var(--amber); background: var(--amber); color: #191407; }
+      .button.primary:hover { border-color: var(--amber-bright); background: var(--amber-bright); }
+      .button.small { padding: 6px 10px; font-size: 12px; }
+      .continue { width: 100%; margin-top: 10px; }
+      .module { border-bottom: 1px solid var(--line); }
+      .module-head { display: flex; align-items: center; gap: 7px; padding: 12px 16px 7px; cursor: pointer; }
+      .module-head:hover { background: var(--surface-raised); }
+      .module-head b { flex: 1; font-family: var(--display); font-size: 12px; line-height: 1.3; }
+      .module-head .count { color: var(--text-dim); font: 10px var(--mono); white-space: nowrap; }
+      .chevron { color: var(--text-dim); font-size: 9px; transition: transform .18s ease-out; }
+      .module.open .chevron { transform: rotate(90deg); }
+      .module-bar { height: 2px; margin: 0 16px 7px; overflow: hidden; border-radius: 3px; background: var(--surface-raised); }
+      .module-bar-fill { height: 100%; background: var(--teal); }
+      .lesson-list { display: none; padding-bottom: 6px; }
+      .module.open .lesson-list { display: block; }
+      .lesson-item { display: flex; align-items: flex-start; gap: 8px; padding: 7px 16px 7px 28px; color: var(--text-dim); cursor: pointer; font-size: 12px; line-height: 1.35; }
+      .lesson-item:hover { background: var(--surface-raised); color: var(--text); }
+      .lesson-item.active { background: var(--amber-dim); color: var(--amber-bright); }
+      .lesson-item .check { display: inline-grid; width: 14px; height: 14px; flex: none; place-items: center; margin-top: 1px; border: 1px solid var(--text-faint); border-radius: 3px; font-size: 9px; }
+      .lesson-item.done .check { border-color: var(--teal); background: var(--teal); color: #10211b; }
+      .lesson-item .title { flex: 1; }
+      .main { min-width: 0; overflow-y: auto; padding: clamp(24px, 4vw, 48px); }
+      .content-width { width: min(820px, 100%); margin: 0 auto; }
+      h1, h2, h3, h4 { font-family: var(--display); line-height: 1.15; }
+      h1 { margin: 0 0 7px; font-size: clamp(25px, 4vw, 38px); letter-spacing: -.04em; }
+      h2 { margin: 0 0 11px; font-size: clamp(21px, 3vw, 29px); letter-spacing: -.03em; }
+      h3 { margin: 0 0 8px; font-size: 16px; }
+      .eyebrow { margin: 0 0 9px; color: var(--amber-bright); font: 700 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+      .subtitle { margin: 0 0 25px; color: var(--text-dim); font-size: 14px; }
+      .card, .module-intro { margin-bottom: 14px; padding: 18px 20px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface); }
+      .card h3 { display: flex; align-items: center; gap: 8px; color: var(--text-dim); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+      .card p, .card li, .module-intro p { margin-top: 0; color: var(--text-dim); font-size: 14px; }
+      .card p:last-child, .module-intro p:last-child { margin-bottom: 0; }
+      .module-intro { border-color: rgba(212,165,55,.65); background: linear-gradient(145deg, rgba(59,50,26,.8), rgba(25,34,41,.95)); }
+      .module-intro .module-number { color: var(--amber-bright); font: 700 12px var(--mono); }
+      .lesson-header { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-bottom: 7px; }
+      .badge { padding: 4px 9px; border: 1px solid var(--line); border-radius: 999px; color: var(--text-dim); font: 11px var(--mono); }
+      .roadmap { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 22px; }
+      .roadmap-item { padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); }
+      .roadmap-item strong { display: block; margin-bottom: 3px; font-family: var(--display); }
+      .roadmap-item span { color: var(--text-dim); font-size: 12px; }
+      .flow { display: grid; gap: 8px; margin: 18px 0 0; padding: 0; list-style: none; counter-reset: flow; }
+      .flow li { display: flex; gap: 10px; color: var(--text-dim); }
+      .flow li::before { display: inline-grid; width: 22px; height: 22px; flex: none; place-items: center; border: 1px solid var(--teal); border-radius: 50%; color: var(--teal); content: counter(flow); counter-increment: flow; font: 11px var(--mono); }
+      .code-wrap { overflow: hidden; margin-top: 11px; border: 1px solid var(--line); border-radius: 8px; background: #0c1216; }
+      .code-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 11px; border-bottom: 1px solid var(--line); color: var(--text-faint); font: 10px var(--mono); text-transform: uppercase; }
+      pre { overflow-x: auto; margin: 0; padding: 14px; color: #d8e2de; font: 12px/1.65 var(--mono); white-space: pre-wrap; }
+      .callout { margin-bottom: 14px; padding: 15px 17px; border-radius: 8px; }
+      .callout h3 { margin-bottom: 7px; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; }
+      .callout p { margin: 0; color: var(--text-dim); }
+      .callout.exercise { border: 1px solid var(--violet); background: var(--violet-dim); }
+      .callout.exercise h3 { color: var(--violet); }
+      .callout.expected { border: 1px solid var(--teal); background: var(--teal-dim); }
+      .callout.expected h3 { color: var(--teal); }
+      .checklist { margin: 0; padding: 0; list-style: none; }
+      .checklist li { display: flex; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--line); color: var(--text-dim); cursor: pointer; }
+      .checklist li:last-child { border-bottom: 0; }
+      .checklist .box { width: 15px; height: 15px; flex: none; margin-top: 2px; border: 1px solid var(--text-faint); border-radius: 3px; }
+      .checklist li.checked .box { border-color: var(--teal); background: var(--teal); }
+      .checklist li.checked .text { text-decoration: line-through; }
+      .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 17px; }
+      .footer-note { padding: 13px; color: var(--text-faint); text-align: center; font: 11px var(--mono); }
       @media (max-width: 820px) {
-        body.standalone .shell {
-          padding: 0;
-        }
-        body.standalone .app {
-          min-height: 100vh;
-          border-radius: 0;
-          border: none;
-        }
-        .app {
-          grid-template-columns: 1fr;
-        }
-        .sidebar {
-          max-height: 300px;
-          border-right: none !important;
-          border-bottom: 1px solid var(--line);
-        }
-      }
-      .sidebar {
-        background: var(--surface);
-        border-right: 1px solid var(--line);
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        flex-shrink: 0;
-      }
-      .brand {
-        font-family: 'Space Grotesk', sans-serif;
-        font-weight: 700;
-        font-size: 14px;
-        padding: 16px 14px 10px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        border-bottom: 1px solid var(--line);
-        position: sticky;
-        top: 0;
-        background: var(--surface);
-        z-index: 2;
-      }
-      .brand .dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: var(--amber);
-        flex: none;
-      }
-      .brand .gear {
-        margin-left: auto;
-        background: none;
-        border: none;
-        color: var(--text-dim);
-        cursor: pointer;
-        font-size: 15px;
-        padding: 2px;
-        line-height: 1;
-      }
-      .brand .gear:hover {
-        color: var(--text);
-      }
-      .overall-progress {
-        padding: 11px 14px;
-        border-bottom: 1px solid var(--line);
-      }
-      .overall-progress .lbl {
-        font-size: 11px;
-        color: var(--text-dim);
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 5px;
-      }
-      .bar {
-        height: 5px;
-        border-radius: 4px;
-        background: var(--surface-raised);
-        overflow: hidden;
-      }
-      .bar-fill {
-        height: 100%;
-        background: var(--amber);
-        transition: width 0.3s ease;
-      }
-      .btn-continue {
-        width: 100%;
-        margin-top: 9px;
-      }
-      .module {
-        border-bottom: 1px solid var(--line);
-      }
-      .module-head {
-        padding: 11px 14px;
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        cursor: pointer;
-        user-select: none;
-      }
-      .module-head:hover {
-        background: var(--surface-raised);
-      }
-      .module-head b {
-        font-size: 12px;
-        font-weight: 600;
-        flex: 1;
-        line-height: 1.35;
-      }
-      .module-head .cnt {
-        font-size: 10px;
-        color: var(--text-dim);
-        font-family: 'IBM Plex Mono', monospace;
-        white-space: nowrap;
-      }
-      .module-head .chev {
-        color: var(--text-dim);
-        font-size: 9px;
-        transition: transform 0.15s;
-        flex: none;
-      }
-      .module.open .chev {
-        transform: rotate(90deg);
-      }
-      .mod-bar {
-        height: 2px;
-        background: var(--surface-raised);
-        margin: 0 14px 6px;
-        border-radius: 2px;
-        overflow: hidden;
-      }
-      .mod-bar-fill {
-        height: 100%;
-        background: var(--teal);
-      }
-      .lesson-list {
-        display: none;
-        padding-bottom: 6px;
-      }
-      .module.open .lesson-list {
-        display: block;
-      }
-      .lesson-item {
-        display: flex;
-        align-items: center;
-        gap: 7px;
-        padding: 6px 14px 6px 24px;
-        cursor: pointer;
-        font-size: 12px;
-        color: var(--text-dim);
-      }
-      .lesson-item:hover {
-        background: var(--surface-raised);
-        color: var(--text);
-      }
-      .lesson-item.active {
-        background: var(--amber-dim);
-        color: var(--amber);
-      }
-      .lesson-item.new-topic .ltitle::before {
-        content: '🆕 ';
-        font-size: 10px;
-      }
-      .lesson-item .chk {
-        width: 13px;
-        height: 13px;
-        border-radius: 3px;
-        border: 1.5px solid var(--text-dim);
-        flex: none;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 8px;
-      }
-      .lesson-item.done .chk {
-        background: var(--teal);
-        border-color: var(--teal);
-        color: #0d1512;
-      }
-      .lesson-item .ltitle {
-        flex: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .main {
-        padding: 26px 32px;
-        overflow-y: auto;
-      }
-      h1 {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 20px;
-        margin: 0 0 4px;
-        font-weight: 700;
-      }
-      h2 {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 16px;
-        margin: 20px 0 10px;
-        font-weight: 600;
-      }
-      .subtitle {
-        color: var(--text-dim);
-        font-size: 13px;
-        margin-bottom: 18px;
-      }
-      .lesson-header {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-bottom: 6px;
-      }
-      .badge {
-        font-size: 11px;
-        color: var(--text-dim);
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        padding: 3px 10px;
-      }
-      .badge.new {
-        border-color: var(--violet);
-        color: var(--violet);
-      }
-      button {
-        font-family: 'IBM Plex Sans', sans-serif;
-        font-weight: 600;
-        font-size: 13px;
-        padding: 9px 16px;
-        border-radius: 6px;
-        border: 1px solid var(--line);
-        background: var(--surface-raised);
-        color: var(--text);
-        cursor: pointer;
-        transition:
-          border-color 0.15s,
-          background 0.15s;
-      }
-      button:hover {
-        border-color: var(--text-dim);
-      }
-      button:disabled {
-        opacity: 0.4;
-        cursor: not-allowed;
-      }
-      button.primary {
-        background: var(--amber);
-        border-color: var(--amber);
-        color: #1a1608;
-      }
-      button.primary:hover {
-        background: #e0b247;
-      }
-      button.ghost {
-        background: transparent;
-      }
-      button.small {
-        padding: 5px 11px;
-        font-size: 12px;
-      }
-      button.teal {
-        background: var(--teal);
-        border-color: var(--teal);
-        color: #0d1512;
-      }
-      .row {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        margin-top: 14px;
-        align-items: center;
-      }
-      .card {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 16px 18px;
-        margin-bottom: 13px;
-      }
-      .card h3 {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 11.5px;
-        text-transform: uppercase;
-        letter-spacing: 0.07em;
-        color: var(--text-dim);
-        margin: 0 0 9px;
-        display: flex;
-        align-items: center;
-        gap: 7px;
-      }
-      .card p {
-        margin: 0;
-        font-size: 13.5px;
-      }
-      .card ul,
-      .card ol {
-        margin: 0;
-        padding-left: 17px;
-      }
-      .card li {
-        margin-bottom: 5px;
-        font-size: 13.5px;
-      }
-      .code-wrap {
-        background: #10151a;
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        margin-top: 8px;
-        overflow: hidden;
-      }
-      .code-title {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 7px 12px;
-        border-bottom: 1px solid var(--line);
-      }
-      .code-label {
-        font-size: 10.5px;
-        color: var(--text-dim);
-        font-family: 'IBM Plex Sans', sans-serif;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-      }
-      .code-body {
-        padding: 13px 14px;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 12px;
-        line-height: 1.6;
-        white-space: pre-wrap;
-        overflow-x: auto;
-        color: var(--text);
-      }
-      .callout {
-        border-radius: 8px;
-        padding: 13px 15px;
-        margin-bottom: 13px;
-        font-size: 13px;
-      }
-      .callout h4 {
-        margin: 0 0 7px;
-        font-size: 11.5px;
-        text-transform: uppercase;
-        letter-spacing: 0.07em;
-        font-family: 'Space Grotesk', sans-serif;
-      }
-      .callout p {
-        margin: 0;
-      }
-      .callout.desafio {
-        background: var(--violet-dim);
-        border: 1px solid var(--violet);
-      }
-      .callout.desafio h4 {
-        color: var(--violet);
-      }
-      .callout.teste {
-        background: var(--teal-dim);
-        border: 1px solid var(--teal);
-      }
-      .callout.teste h4 {
-        color: var(--teal);
-      }
-      .checklist-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 9px;
-        padding: 6px 0;
-        border-bottom: 1px solid var(--line);
-        font-size: 13px;
-        cursor: pointer;
-      }
-      .checklist-item:last-child {
-        border-bottom: none;
-      }
-      .checklist-item .box {
-        width: 14px;
-        height: 14px;
-        border: 1.5px solid var(--text-dim);
-        border-radius: 3px;
-        flex: none;
-        margin-top: 2px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 9px;
-      }
-      .checklist-item.checked .box {
-        background: var(--teal);
-        border-color: var(--teal);
-        color: #0d1512;
-      }
-      .checklist-item.checked .txt {
-        color: var(--text-dim);
-        text-decoration: line-through;
-      }
-      .nivel-row {
-        display: flex;
-        gap: 5px;
-        margin-top: 7px;
-        flex-wrap: wrap;
-      }
-      .nivel-dot {
-        width: 28px;
-        height: 28px;
-        border-radius: 50%;
-        border: 1.5px solid var(--line);
-        background: var(--surface-raised);
-        cursor: pointer;
-        font-size: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .nivel-dot.sel {
-        border-color: var(--amber);
-        box-shadow: 0 0 0 2px var(--amber-dim);
-      }
-      .nivel-lbl {
-        font-size: 11px;
-        color: var(--text-dim);
-        margin-top: 5px;
-      }
-      .intro-card {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        padding: 18px 20px;
-        margin-bottom: 16px;
-      }
-      .intro-card h3 {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 13.5px;
-        margin: 0 0 7px;
-      }
-      .intro-card p {
-        margin: 0 0 7px;
-        font-size: 13px;
-        color: var(--text-dim);
-      }
-      .api-pill {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        background: var(--surface-raised);
-        border: 1px solid var(--line);
-        border-radius: 20px;
-        padding: 4px 11px;
-        font-size: 11.5px;
-        font-family: 'IBM Plex Mono', monospace;
-        margin: 2px 5px 2px 0;
-      }
-      .tag {
-        display: inline-block;
-        font-size: 10px;
-        padding: 2px 7px;
-        border-radius: 10px;
-        font-weight: 600;
-        margin-left: 6px;
-        vertical-align: middle;
-      }
-      .tag.novo {
-        background: var(--violet-dim);
-        color: var(--violet);
-        border: 1px solid var(--violet);
-      }
-      .loading {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        color: var(--text-dim);
-        font-size: 13px;
-        padding: 14px 0;
-      }
-      .spinner {
-        width: 13px;
-        height: 13px;
-        border: 2px solid var(--line);
-        border-top-color: var(--amber);
-        border-radius: 50%;
-        animation: spin 0.7s linear infinite;
-      }
-      @keyframes spin {
-        to {
-          transform: rotate(360deg);
-        }
-      }
-      .error-box {
-        background: var(--brick-dim);
-        border: 1px solid var(--brick);
-        color: var(--text);
-        border-radius: 8px;
-        padding: 13px 15px;
-        font-size: 13px;
-        margin-bottom: 13px;
-      }
-      .footer-note {
-        text-align: center;
-        font-size: 11px;
-        color: var(--text-dim);
-        padding: 12px 6px 4px;
-      }
-      .modal-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        padding: 20px;
-      }
-      .modal-card {
-        background: var(--surface);
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        padding: 22px;
-        max-width: 480px;
-        width: 100%;
-      }
-      .modal-card h2 {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 16px;
-        margin: 0 0 6px;
-      }
-      .modal-card input[type='password'] {
-        width: 100%;
-        background: #10151a;
-        border: 1px solid var(--line);
-        border-radius: 6px;
-        color: var(--text);
-        padding: 10px 12px;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 12.5px;
-        margin: 10px 0;
-      }
-      .modal-note {
-        font-size: 11.5px;
-        color: var(--text-dim);
-        line-height: 1.5;
-      }
-      .modal-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-        margin-top: 13px;
-      }
+        .back-home { width: calc(100% - 24px); margin: 12px auto 8px; }
+        .app { grid-template-columns: 1fr; width: 100%; min-height: calc(100vh - 50px); border-right: 0; border-left: 0; border-radius: 0; }
+        .sidebar { max-height: 360px; border-right: 0; border-bottom: 1px solid var(--line); }
+        .main { padding: 28px 18px; }
+      }
+      @media (max-width: 520px) { .roadmap { grid-template-columns: 1fr; } }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; } }
     </style>
   </head>
   <body>
     <div class="shell">
       <a class="back-home" href="index.html">← Voltar ao portfólio de QA</a>
       <div class="app">
-        <div class="sidebar">
-          <div class="brand">
-            <span class="dot"></span>Zero → Automação de API
-          </div>
+        <aside class="sidebar" aria-label="Módulos da trilha">
+          <div class="brand"><span class="brand-mark" aria-hidden="true">QA</span> Trilha de testes de API</div>
           <div class="overall-progress">
-            <div class="lbl">
-              <span>Progresso</span><span id="overall-label">0/0</span>
-            </div>
-            <div class="bar">
-              <div class="bar-fill" id="overall-bar" style="width: 0%"></div>
-            </div>
-            <button class="small primary btn-continue" id="btn-continuar">
-              Continuar de onde parei →
-            </button>
+            <div class="progress-label"><span>Progresso</span><span id="progress-label">0/16</span></div>
+            <div class="bar" aria-hidden="true"><div class="bar-fill" id="progress-bar" style="width:0%"></div></div>
+            <button class="button primary continue" id="continue-button" type="button">Continuar estudos →</button>
           </div>
           <div id="modules-list"></div>
-        </div>
-        <div class="main">
-          <div id="content-area"></div>
-        </div>
+        </aside>
+        <main class="main"><div class="content-width" id="content"></div></main>
       </div>
-      <div class="footer-note">
-        Progresso salvo neste navegador · Versão 1.1.0
-      </div>
+      <div class="footer-note">Conteúdo local · progresso salvo neste navegador · sem IA, backend ou login obrigatório</div>
     </div>
 
     <script>
       const CURRICULO = [
         {
-          id: 'm1',
-          titulo: 'Fundamentos de API e HTTP',
-          licoes: [
-            {
-              id: 'm1-l1',
-              titulo: 'O que é uma API — cliente e servidor',
-              desc: 'Conceito de API, quem é cliente, quem é servidor, e por que essa divisão existe.',
-            },
-            {
-              id: 'm1-l2',
-              titulo: 'Request e Response',
-              desc: 'O ciclo de pedir e receber dados: o que compõe uma requisição e uma resposta.',
-            },
-            {
-              id: 'm1-l3',
-              titulo: 'HTTP e HTTPS',
-              desc: 'O protocolo por trás de toda comunicação web, e por que o "S" importa.',
-            },
-            {
-              id: 'm1-l4',
-              titulo: 'URL, endpoint, path e query parameters',
-              desc: 'Como decompor um endereço de API e entender cada parte dele — URL base, path, query string, fragmento.',
-            },
-            {
-              id: 'm1-l5',
-              titulo: 'Métodos HTTP — GET, POST, PUT, PATCH, DELETE',
-              desc: 'O verbo da requisição: o que cada um significa, quando usar, e o que acontece no servidor.',
-            },
-            {
-              id: 'm1-l6',
-              titulo: 'Status codes — 2xx, 4xx, 5xx',
-              desc: 'Como interpretar os códigos de resposta e o que cada faixa comunica.',
-            },
-            {
-              id: 'm1-l7',
-              titulo: 'Headers e Body',
-              desc: 'Metadados da requisição vs. o conteúdo em si — Content-Type, Authorization, Accept.',
-            },
-            {
-              id: 'm1-l8',
-              titulo: 'Autenticação e Autorização',
-              desc: 'A diferença entre "quem você é" e "o que você pode fazer" — Basic Auth, Bearer Token, API Key.',
-            },
-            {
-              id: 'm1-l9',
-              titulo: 'JSON, REST e CRUD',
-              desc: 'O formato de dados padrão, o estilo de arquitetura, e as quatro operações básicas.',
-            },
+          id: 'm1', title: '01 - Fundamentos de API', intro: 'Antes de usar uma ferramenta, entenda quem conversa com quem e qual problema a API resolve.',
+          lessons: [
+            { title: 'API, cliente e servidor', concept: 'Uma API é um conjunto de regras para um sistema receber pedidos e devolver respostas. O cliente faz a requisição; o servidor processa a regra e responde.', example: 'Pense em um aplicativo de banco: a tela é cliente, a API recebe “consultar saldo” e o serviço devolve os dados permitidos.', code: 'Cliente → GET /accounts/42 → API\nAPI → 200 OK + dados da conta → Cliente', exercise: 'Explique, com suas palavras, qual é o cliente e qual é o servidor em uma aplicação web que você conhece.', expected: 'Você consegue separar a interface que faz o pedido do serviço que processa e responde.', checklist: ['Consigo explicar o papel de uma API.', 'Sei diferenciar cliente e servidor.'] },
+            { title: 'Request, response e JSON', concept: 'Toda chamada tem uma requisição e uma resposta. A requisição pode levar método, URL, headers e body; a resposta traz status, headers e body, muitas vezes em JSON.', example: 'Uma requisição POST envia dados de um usuário. A resposta 201 informa que um novo recurso foi criado e pode retornar o id.', code: 'POST /users\nContent-Type: application/json\n\n{ "name": "Ana" }\n\n201 Created\n{ "id": 7, "name": "Ana" }', exercise: 'Liste quais partes pertencem à requisição e quais pertencem à resposta no exemplo.', expected: 'Você identifica método, endpoint, header e body da requisição; status e JSON do retorno.', checklist: ['Reconheço request e response.', 'Consigo ler um JSON simples.'] },
           ],
         },
         {
-          id: 'm2',
-          titulo: 'Pensando como QA de API',
-          licoes: [
-            {
-              id: 'm2-l1',
-              titulo: 'Cenários positivos (happy path)',
-              desc: 'O caminho esperado: o que validar quando tudo dá certo.',
-            },
-            {
-              id: 'm2-l2',
-              titulo: 'Cenários negativos (negative path)',
-              desc: 'O que testar quando algo dá errado de propósito: dados inválidos, ausentes, malformados.',
-            },
-            {
-              id: 'm2-l3',
-              titulo: 'Contratos de API e validação de resposta',
-              desc: 'O que é um contrato de API e como validar que a resposta cumpre o que promete.',
-            },
-            {
-              id: 'm2-l4',
-              titulo: 'Matriz de cenários de teste',
-              desc: 'Construindo a tabela: Cenário → Entrada → Resultado esperado → Validações.',
-            },
-            {
-              id: 'm2-l5',
-              titulo: 'Dados de teste',
-              desc: 'Como pensar os dados que você usa para testar: variedade, limites, formatos, dados mockados.',
-            },
+          id: 'm2', title: '02 - HTTP e REST', intro: 'HTTP fornece a linguagem da comunicação. REST organiza recursos e operações usando essa linguagem.',
+          lessons: [
+            { title: 'Métodos HTTP e CRUD', concept: 'GET consulta, POST cria, PUT substitui, PATCH altera parte e DELETE remove. CRUD é a forma de relacionar criar, consultar, atualizar e remover recursos.', example: 'Para um recurso /products, a suíte pode ter GET /products, POST /products, PATCH /products/7 e DELETE /products/7.', code: 'GET     /products       # consultar\nPOST    /products       # criar\nPATCH   /products/7     # atualizar parte\nDELETE  /products/7     # remover', exercise: 'Escolha o método para alterar somente o e-mail do usuário 7 e explique por que escolheu esse método.', expected: 'Você escolhe PATCH e deixa claro que a alteração é parcial, conforme o contrato.', checklist: ['Sei relacionar método e intenção.', 'Entendo CRUD como operações sobre recursos.'] },
+            { title: 'Status code, headers e autenticação', concept: 'O status indica o resultado geral: 2xx costuma representar sucesso, 4xx erro na requisição do cliente e 5xx falha no processamento do servidor. Headers carregam metadados, como Content-Type e Authorization.', example: 'Um teste de acesso sem credencial pode esperar 401. Um acesso autenticado sem permissão pode esperar 403; não trate os dois como o mesmo caso.', code: 'Authorization: Bearer {{token}}\nAccept: application/json\n\n200 OK   | resposta válida\n401      | autenticação ausente ou inválida\n403      | sem permissão', exercise: 'Monte uma tabela com três cenários: sucesso, token ausente e recurso inexistente. Defina o status esperado para cada um.', expected: 'Cada cenário tem um resultado esperado separado e uma justificativa baseada no contrato.', checklist: ['Leio status e headers juntos.', 'Diferencio autenticação de autorização.'] },
           ],
         },
         {
-          id: 'm25',
-          titulo: 'Lendo e interpretando documentação de API',
-          novo: true,
-          licoes: [
-            {
-              id: 'm25-l1',
-              titulo: 'O que é documentação de API e por que ela existe',
-              desc: 'Por que toda API precisa de documentação, o que você encontra nela e como não se perder na primeira vez que abrir.',
-              novo: true,
-            },
-            {
-              id: 'm25-l2',
-              titulo: 'Anatomia de um endpoint documentado',
-              desc: 'Decompondo cada parte de um endpoint documentado: método, URL base, path, parâmetros, headers obrigatórios, body esperado, resposta de sucesso e de erro.',
-              novo: true,
-            },
-            {
-              id: 'm25-l3',
-              titulo: 'O que é Swagger — lendo e navegando',
-              desc: 'O que é Swagger/OpenAPI, como navegar na interface, onde ficam os endpoints, o que cada campo significa e como testar direto no Swagger UI.',
-              novo: true,
-            },
-            {
-              id: 'm25-l4',
-              titulo: 'O que é um DTO (Data Transfer Object)',
-              desc: 'O que é DTO, por que ele existe, como lê-lo na documentação, como o DTO define o que você envia e o que você recebe, e como usar isso para montar seus testes.',
-              novo: true,
-            },
-            {
-              id: 'm25-l5',
-              titulo: 'O que é um contrato de API — na prática',
-              desc: 'Contrato como promessa entre quem cria a API e quem consome: campos obrigatórios, tipos de dado, valores válidos, o que nunca pode mudar sem quebrar quem consome.',
-              novo: true,
-            },
-            {
-              id: 'm25-l6',
-              titulo: 'O que são dados mockados e por que eles existem',
-              desc: 'Diferença entre dado real e dado mockado, quando a API usa mock, como identificar isso e como testar contra dados mockados sem quebrar o raciocínio de QA.',
-              novo: true,
-            },
-            {
-              id: 'm25-l7',
-              titulo: 'Lendo a documentação da Restful-Booker — guiado',
-              desc: 'Leitura completa e comentada da documentação oficial da Restful-Booker: cada endpoint, cada parâmetro, cada resposta esperada — com olhar de QA.',
-              novo: true,
-            },
-            {
-              id: 'm25-l8',
-              titulo: 'De documentação para caso de teste — passo a passo',
-              desc: 'Como transformar o que você leu na documentação em cenário de teste: extraindo regras, identificando o que validar, montando a matriz.',
-              novo: true,
-            },
-            {
-              id: 'm25-l9',
-              titulo:
-                'O que substituir em um script — identificando placeholders',
-              desc: 'Como ler um script de teste pronto e saber exatamente o que você precisa substituir, onde buscar esse valor, e o que acontece se você não substituir.',
-              novo: true,
-            },
-            {
-              id: 'm25-l10',
-              titulo:
-                'Montando seu primeiro script completo a partir da documentação',
-              desc: 'Exercício prático: pegar a documentação de um endpoint da Restful-Booker, entender o DTO, identificar o contrato, e montar do zero um script de teste no Postman.',
-              novo: true,
-            },
+          id: 'm3', title: '03 - Postman', intro: 'Postman ajuda a montar requests, organizar Collections e executar uma sequência de verificações manualmente.',
+          lessons: [
+            { title: 'A primeira requisição e a leitura do retorno', concept: 'Crie uma request, escolha o método, informe a URL, envie e observe status, body, headers e tempo. A ferramenta mostra o resultado; a decisão de QA vem do contrato.', example: 'Use uma API pública de estudo, como Postman Echo, para enviar GET /get?nome=Ana e conferir se o parâmetro aparece na resposta.', code: 'GET https://postman-echo.com/get?nome=Ana\n\nVerifique: status 200, argumento nome e formato JSON.', exercise: 'Repita a request com outro valor de nome e registre o resultado obtido.', expected: 'A request retorna 200 e o valor enviado aparece no JSON de resposta.', checklist: ['Consigo criar uma request GET.', 'Observo body, headers e status.'] },
+            { title: 'Collections, environments e variáveis', concept: 'Collection agrupa requests relacionadas. Environment guarda valores que mudam por ambiente. Variáveis evitam repetir URL, id e token no código.', example: 'Uma request usa {{baseUrl}}/users/{{userId}}; o environment de teste define os valores sem alterar a request.', code: '{{baseUrl}} = https://api.exemplo.test\n{{userId}} = 7\n\nGET {{baseUrl}}/users/{{userId}}', exercise: 'Crie uma Collection com uma request de leitura e substitua a URL fixa por {{baseUrl}}.', expected: 'A request fica reutilizável e você consegue trocar o ambiente alterando apenas as variáveis.', checklist: ['Sei criar uma Collection.', 'Entendo por que variáveis reduzem repetição.'] },
           ],
         },
         {
-          id: 'm3',
-          titulo: 'Postman — do zero à suíte profissional',
-          licoes: [
-            {
-              id: 'm3-l1',
-              titulo: 'Instalação e interface',
-              desc: 'Workspace, request, onde fica cada coisa no Postman.',
-            },
-            {
-              id: 'm3-l2',
-              titulo: 'Primeira request — GET na Restful-Booker',
-              desc: 'Sua primeira chamada de API real, passo a passo.',
-            },
-            {
-              id: 'm3-l3',
-              titulo: 'Params, Headers e Body na prática',
-              desc: 'Montando uma requisição completa dentro do Postman.',
-            },
-            {
-              id: 'm3-l4',
-              titulo: 'Collections — organização profissional',
-              desc: 'O que são, por que existem, como estruturar uma suíte.',
-            },
-            {
-              id: 'm3-l5',
-              titulo: 'Variáveis e Environments',
-              desc: 'Por que {{baseUrl}} é melhor que repetir a URL em cada request.',
-            },
-            {
-              id: 'm3-l6',
-              titulo: 'Scripts de teste e assertions — pm.test()',
-              desc: 'Escrevendo testes dentro do Postman com JavaScript.',
-            },
-            {
-              id: 'm3-l7',
-              titulo: 'Dados mockados no Postman — Mock Server',
-              desc: 'Como criar um Mock Server no Postman, quando usar, e como testar contra dados simulados antes da API existir de verdade.',
-              novo: true,
-            },
-            {
-              id: 'm3-l8',
-              titulo: 'Fluxo POST → capturar ID → GET → validar',
-              desc: 'Encadeando requisições e reaproveitando dados entre elas.',
-            },
-            {
-              id: 'm3-l9',
-              titulo: 'Autenticação na prática — POST /auth na Restful-Booker',
-              desc: 'Gerando e usando um token de autenticação.',
-            },
-            {
-              id: 'm3-l10',
-              titulo: 'Collection Runner',
-              desc: 'Executando uma suíte inteira de uma vez.',
-            },
-            {
-              id: 'm3-l11',
-              titulo: 'Organizando como projeto profissional',
-              desc: 'Transformando uma Collection de exercícios em estrutura de empresa.',
-            },
+          id: 'm4', title: '04 - JavaScript no Postman', intro: 'Scripts tornam as validações repetíveis. Comece com assertions simples e avance para dados extraídos da resposta.',
+          lessons: [
+            { title: 'Assertions com pm.test()', concept: 'Uma assertion transforma uma expectativa em uma verificação automática. A mensagem deve explicar a regra, não apenas repetir o status.', example: 'Depois de chamar um endpoint, verifique status 200 e se o body tem a propriedade id.', code: 'pm.test("Status esperado", function () {\n  pm.response.to.have.status(200);\n});\n\nconst body = pm.response.json();\npm.test("Resposta possui id", function () {\n  pm.expect(body.id).to.exist;\n});', exercise: 'Adicione uma assertion para confirmar que body.name é uma string.', expected: 'O Postman mostra testes aprovados quando as condições são atendidas e informa qual regra falhou.', checklist: ['Uso pm.test() com uma intenção clara.', 'Valido status e um campo do JSON.'] },
+            { title: 'Pre-request, variáveis e chaining', concept: 'O pre-request prepara dados antes da chamada. No pós-resposta, um valor pode ser salvo em variável e usado pela próxima request. Assim nasce o request chaining.', example: 'Depois de criar um recurso, capture o id retornado e use {{resourceId}} na consulta seguinte.', code: 'const body = pm.response.json();\npm.collectionVariables.set("resourceId", body.id);\n\n// Próxima request\nGET {{baseUrl}}/resources/{{resourceId}}', exercise: 'Desenhe o fluxo POST → capturar id → GET e escreva qual evidência será validada em cada etapa.', expected: 'O id é reutilizado sem copiar manualmente o valor e a sequência tem uma regra de validação por etapa.', checklist: ['Sei salvar uma variável de Collection.', 'Entendo o encadeamento entre requests.'] },
           ],
         },
         {
-          id: 'm4',
-          titulo: 'Cypress — do zero ao primeiro teste de API',
-          licoes: [
-            {
-              id: 'm4-l1',
-              titulo: 'Por que Cypress (Postman vs. Cypress)',
-              desc: 'Quando cada ferramenta faz mais sentido, e por que aprender as duas.',
-            },
-            {
-              id: 'm4-l2',
-              titulo: 'Instalação — Node.js, npm e Cypress',
-              desc: 'Preparando o ambiente antes do primeiro teste.',
-            },
-            {
-              id: 'm4-l3',
-              titulo: 'Estrutura do projeto e configuração',
-              desc: 'Como um projeto Cypress é organizado por padrão.',
-            },
-            {
-              id: 'm4-l4',
-              titulo: 'Primeiro teste — describe, it, cy.request()',
-              desc: 'Escrevendo e rodando seu primeiro teste de API em código.',
-            },
-            {
-              id: 'm4-l5',
-              titulo: 'Assertions com expect() e then()',
-              desc: 'Validando respostas de forma programática.',
-            },
-            {
-              id: 'm4-l6',
-              titulo: 'GET → validar status e body',
-              desc: 'Seu primeiro teste completo de leitura de dados.',
-            },
-            {
-              id: 'm4-l7',
-              titulo: 'POST → validar criação e capturar dados',
-              desc: 'Criando um recurso e usando o retorno nos passos seguintes.',
-            },
-            {
-              id: 'm4-l8',
-              titulo: 'Fluxo POST → GET → UPDATE → GET',
-              desc: 'Ciclo completo de atualização encadeado.',
-            },
-            {
-              id: 'm4-l9',
-              titulo: 'Fluxo POST → GET → DELETE → validar remoção',
-              desc: 'Ciclo completo de exclusão encadeado.',
-            },
+          id: 'm5', title: '05 - Swagger/OpenAPI', intro: 'A documentação é a fonte para entender endpoints, parâmetros, modelos e respostas antes de testar.',
+          lessons: [
+            { title: 'Como ler um endpoint documentado', concept: 'Leia na ordem: método, URL base, path, parâmetros obrigatórios, headers, body, respostas e modelos. O que não estiver documentado deve ser tratado como dúvida, não como suposição.', example: 'Na documentação do Swagger Petstore, localize GET /pet/{petId}. O path parameter petId é parte obrigatória do endereço.', code: 'Documentação: https://petstore3.swagger.io/\n\nGET /pet/{petId}\nPath parameter: petId (integer)\nResposta: 200 Pet | 404', exercise: 'Abra a documentação do Swagger Petstore, localize GET /pet/{petId} e anote método, parâmetro e respostas.', expected: 'Você encontra o endpoint na documentação e consegue explicar o que precisa ser enviado e o que pode voltar.', checklist: ['Sei localizar método e path.', 'Identifico parâmetros obrigatórios e respostas.'] },
+            { title: 'Do Swagger para o Postman', concept: 'Depois de entender o contrato, monte a request sem improvisar campos. Use o exemplo da documentação para formar a URL e compare a resposta real com o modelo documentado.', example: 'Para um pet existente, envie GET https://petstore3.swagger.io/api/v3/pet/1 e valide o status, o id, o name e o status do pet.', code: 'GET https://petstore3.swagger.io/api/v3/pet/1\n\npm.test("Pet encontrado", function () {\n  pm.response.to.have.status(200);\n  const pet = pm.response.json();\n  pm.expect(pet.id).to.exist;\n  pm.expect(pet.name).to.be.a("string");\n});', exercise: 'Execute a request no Postman. Depois teste um id inexistente e compare o status e o body de erro com a documentação.', expected: 'O fluxo segue documentação → endpoint → request → assertions → execução → análise, incluindo um caso positivo e um negativo.', checklist: ['Converto um endpoint documentado em request.', 'Analiso resposta de sucesso e de erro.'] },
           ],
         },
         {
-          id: 'm5',
-          titulo: 'Arquitetura profissional e boas práticas',
-          licoes: [
-            {
-              id: 'm5-l1',
-              titulo: 'Organização de arquivos e fixtures',
-              desc: 'Separando dados de teste do código de teste.',
-            },
-            {
-              id: 'm5-l2',
-              titulo: 'Comandos reutilizáveis (custom commands)',
-              desc: 'Evitando repetição — criando seus próprios comandos Cypress.',
-            },
-            {
-              id: 'm5-l3',
-              titulo: 'Variáveis de ambiente e dados de teste',
-              desc: 'Configurações que mudam entre ambientes, sem tocar no código.',
-            },
-            {
-              id: 'm5-l4',
-              titulo: 'Independência entre testes e manutenção',
-              desc: 'Por que um teste não deve depender do resultado de outro.',
-            },
+          id: 'm6', title: '06 - Cypress API Testing', intro: 'Cypress permite colocar a validação em código, versionar o teste e executá-lo novamente com o mesmo procedimento.',
+          lessons: [
+            { title: 'cy.request() e primeira validação', concept: 'cy.request() faz uma chamada HTTP dentro do teste. A resposta pode ser validada com expect, mantendo a regra perto do cenário.', example: 'O teste abaixo consulta um pet e valida status e campos básicos. A URL é de estudo e pode variar; confirme o contrato antes de executar.', code: 'describe("Pet API", () => {\n  it("consulta um pet", () => {\n    cy.request("GET", \\"https://petstore3.swagger.io/api/v3/pet/1\\")\n      .then((response) => {\n        expect(response.status).to.eq(200);\n        expect(response.body.id).to.exist;\n      });\n  });\n});', exercise: 'Transcreva para Cypress a validação de status e name que você fez no Postman.', expected: 'O teste executa a request e falha com uma mensagem clara quando o status ou o campo não atende ao esperado.', checklist: ['Sei estruturar describe e it.', 'Uso cy.request() com uma assertion.'] },
+            { title: 'Dados, status e cenários negativos', concept: 'Um teste de API em Cypress deve deixar dados, método e expectativas visíveis. Para erros esperados, configure a chamada para observar a resposta sem esconder o status.', example: 'Teste um id inexistente e valide o código documentado, a estrutura do erro e a mensagem quando o contrato definir esses campos.', code: 'cy.request({\n  url: "https://petstore3.swagger.io/api/v3/pet/999999999",\n  failOnStatusCode: false,\n}).then((response) => {\n  expect([404, 400]).to.include(response.status);\n});', exercise: 'Crie uma tabela com o cenário positivo e o negativo e implemente os dois como testes independentes.', expected: 'Cada teste pode ser executado sozinho e o resultado diferencia falha da API de comportamento esperado de erro.', checklist: ['Sei testar um status de erro esperado.', 'Mantenho cenários independentes.'] },
           ],
         },
         {
-          id: 'm6',
-          titulo: 'Portfólio e mercado',
-          licoes: [
-            {
-              id: 'm6-l1',
-              titulo: 'README e documentação do projeto',
-              desc: 'Escrevendo a documentação que faz seu projeto parecer profissional.',
-            },
-            {
-              id: 'm6-l2',
-              titulo: 'Git e GitHub — versionando o projeto',
-              desc: 'Colocando o projeto no ar de forma versionada.',
-            },
-            {
-              id: 'm6-l3',
-              titulo: 'Preparando para CI/CD',
-              desc: 'O que é, por que importa, e os primeiros passos.',
-            },
-            {
-              id: 'm6-l4',
-              titulo: 'Usando IA como apoio — não como muleta',
-              desc: 'Como usar IA para pensar melhor, sem terceirizar o raciocínio.',
-            },
-            {
-              id: 'm6-l5',
-              titulo: 'Perguntas de entrevista — treino de explicação',
-              desc: 'Praticando como explicar suas decisões técnicas numa entrevista.',
-            },
+          id: 'm7', title: '07 - Automação de Testes', intro: 'Automatizar é escolher verificações repetitivas e confiáveis, mantendo dados, código e evidências fáceis de entender.',
+          lessons: [
+            { title: 'O que automatizar e como organizar', concept: 'Priorize smoke, regressão e regras que precisam ser repetidas. Separe configuração, dados e testes; não esconda uma regra importante em uma função sem nome claro.', example: 'Uma suíte pode ter pastas para contratos, recursos, cenários positivos e cenários negativos, com variáveis de ambiente fora do código.', code: 'cypress/\n  e2e/api/pets/\n    pet-read.cy.js\n    pet-negative.cy.js\n  fixtures/\n  support/\nconfig/\n  test.env.example', exercise: 'Escolha três testes do módulo 5 e classifique cada um como smoke, regressão ou exploratório.', expected: 'Você justifica a escolha pelo risco, frequência e estabilidade do cenário.', checklist: ['Sei priorizar automação.', 'Separo dados e configuração do teste.'] },
+            { title: 'Execução e evidências', concept: 'Uma automação útil precisa ser executável por outra pessoa. Registre comando, ambiente, resultado e evidência da falha sem incluir segredos.', example: 'No pipeline, a suíte roda com uma variável de ambiente; um relatório mostra qual teste falhou e qual resposta foi observada.', code: 'npx cypress run --spec "cypress/e2e/api/**/*.cy.js"\n\n# Nunca versionar\nAPI_TOKEN=valor-real\nSENHA=segredo', exercise: 'Escreva um pequeno procedimento para outra pessoa executar sua suíte localmente e registrar uma falha.', expected: 'O procedimento informa pré-requisitos, comando, ambiente seguro e onde encontrar o resultado.', checklist: ['Sei descrever como executar a suíte.', 'Protejo tokens, senhas e dados reais.'] },
+          ],
+        },
+        {
+          id: 'm8', title: '08 - Boas Práticas de QA', intro: 'A qualidade da automação depende da qualidade do raciocínio: contrato claro, cenário relevante, evidência e manutenção.',
+          lessons: [
+            { title: 'Validação além do status code', concept: '200 não prova que tudo está correto. Valide estrutura, tipos, valores, regras de negócio, headers e efeitos esperados quando o contrato permitir.', example: 'Uma busca pode retornar 200 com uma lista, mas ainda estar errada se o campo total não for numérico ou se itens fora do filtro aparecerem.', code: 'pm.test("Lista tem estrutura esperada", function () {\n  const body = pm.response.json();\n  pm.expect(body.items).to.be.an("array");\n  pm.expect(body.total).to.be.a("number");\n});', exercise: 'Pegue uma resposta JSON e escreva quatro validações: status, estrutura, tipo e regra de negócio.', expected: 'As validações cobrem dimensões diferentes e cada mensagem explica a regra verificada.', checklist: ['Não confundo status com qualidade completa.', 'Valido estrutura, tipos e regra.'] },
+            { title: 'Manutenção, risco e revisão', concept: 'Testes devem ser independentes, legíveis e alinhados ao contrato atual. Quando a API muda, revise o risco, atualize dados e preserve evidências do motivo da mudança.', example: 'Antes de alterar uma assertion, confira se o contrato mudou, se a regra de negócio mudou ou se o ambiente está instável. A correção depende da causa.', code: 'Revisão de falha\n1. Reproduzir\n2. Conferir contrato\n3. Conferir dados e ambiente\n4. Classificar causa\n5. Corrigir teste ou abrir defeito\n6. Executar regressão', exercise: 'Descreva como investigaria uma falha que aparece apenas no ambiente de teste.', expected: 'Você investiga de forma ordenada e não altera a expectativa apenas para deixar o teste verde.', checklist: ['Investigo a causa antes de corrigir.', 'Considero risco e regressão.'] },
           ],
         },
       ];
 
-      const NIVEIS = [
-        'Não conheço',
-        'Reconheço o conceito',
-        'Consigo fazer com orientação',
-        'Consigo fazer sozinho',
-        'Consigo explicar para outra pessoa',
-        'Consigo resolver um problema novo',
-      ];
-      const NIVEL_EMOJI = ['🟢', '🔵', '🟡', '🟠', '🔴', '🟣'];
+      const state = { activeLessonId: null, openModuleId: null };
+      const storageKey = 'qa_api_learning_progress_v2';
+      let progress = loadProgress();
 
-      const st = { activeLessonId: null };
-      function loadJ(k, fb) {
-        try {
-          const v = localStorage.getItem(k);
-          return v ? JSON.parse(v) : fb;
-        } catch {
-          return fb;
-        }
-      }
-      function saveJ(k, v) {
-        try {
-          localStorage.setItem(k, JSON.stringify(v));
-        } catch {}
-      }
-      let progress = loadJ('apiqacurso_progress_v110', {});
-      let cache = loadJ('apiqacurso_content_v110', {});
-
-      function gp(id) {
-        if (!progress[id])
-          progress[id] = { done: false, nivel: 0, checklist: [] };
-        return progress[id];
-      }
-      function sp() {
-        saveJ('apiqacurso_progress_v110', progress);
-      }
-      function sc() {
-        saveJ('apiqacurso_content_v110', cache);
-      }
-      function allLessons() {
-        return CURRICULO.flatMap((m) =>
-          m.licoes.map((l) => ({
-            ...l,
-            moduloId: m.id,
-            moduloTitulo: m.titulo,
-            moduloNovo: !!m.novo,
-          }))
-        );
-      }
-      function esc(s) {
-        if (!s) return '';
-        return String(s).replace(
-          /[&<>"']/g,
-          (c) =>
-            ({
-              '&': '&amp;',
-              '<': '&lt;',
-              '>': '&gt;',
-              '"': '&quot;',
-              "'": '&#39;',
-            })[c]
-        );
-      }
-
-      const SYS_LESSON = `Você é um instrutor sênior de QA e Automação de Testes de API ensinando iniciantes do zero. Formato de resposta — JSON PURO, sem markdown:
-{
-  "objetivo": "1 frase",
-  "conceito": "explicação simples, máx 4 frases",
-  "analogia": "comparação cotidiana",
-  "comoFunciona": "explicação técnica",
-  "exemploTecnico": "exemplo real",
-  "exemploProfissional": "mercado",
-  "pratica": ["passo 1", "passo 2"],
-  "teste": "como verificar",
-  "desafio": "exercício",
-  "resumo": "resumo",
-  "checklist": ["item 1", "item 2"]
-}`;
-
-      function buildLessonLocally(lesson) {
-        return {
-          objetivo: lesson.desc,
-          conceito: `${lesson.titulo} é estudado com exemplos e verificações locais, usando somente o conteúdo deste currículo.`,
-          analogia: 'Pense na aula como um roteiro de estudo: primeiro você entende, depois pratica e por fim confere o resultado.',
-          comoFunciona: 'Leia a explicação, observe o exemplo versionado e avance apenas quando conseguir explicar o que foi apresentado.',
-          exemploTecnico: `Exemplo relacionado ao tema: ${lesson.titulo}. Ajuste os valores ao contrato ou material que estiver estudando.`,
-          exemploProfissional: 'Em um projeto real, confirme a regra na documentação e registre a evidência antes de concluir o teste.',
-          pratica: ['Leia o objetivo da aula.', 'Anote o que ainda não está claro.', 'Compare sua resposta com a documentação disponível.'],
-          teste: 'Verifique se você consegue explicar o conceito e identificar o resultado esperado sem consultar uma fonte não versionada.',
-          desafio: `Descreva um exemplo próprio para o tema “${lesson.titulo}” e indique o que precisaria ser confirmado.`,
-          resumo: `A aula apresenta ${lesson.titulo.toLowerCase()} de forma progressiva e prática.`,
-          checklist: ['Entendi o conceito principal.', 'Consegui relacionar o exemplo ao tema.', 'Registrei dúvidas ou GAPs restantes.'],
-        };
-      }
-
-      let openMod = null;
-      function counts() {
-        let d = 0,
-          t = 0;
-        CURRICULO.forEach((m) =>
-          m.licoes.forEach((l) => {
-            t++;
-            if (gp(l.id).done) d++;
-          })
-        );
-        return { d, t };
-      }
+      function allLessons() { return CURRICULO.flatMap((module) => module.lessons.map((lesson, index) => ({ ...lesson, id: `${module.id}-l${index + 1}`, moduleId: module.id, moduleTitle: module.title }))); }
+      function getProgress(id) { if (!progress[id]) progress[id] = { done: false, checklist: [] }; return progress[id]; }
+      function loadProgress() { try { return JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch { return {}; } }
+      function saveProgress() { try { localStorage.setItem(storageKey, JSON.stringify(progress)); } catch {} }
+      function esc(value) { return String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]); }
+      function totals() { const lessons = allLessons(); return { total: lessons.length, done: lessons.filter((lesson) => getProgress(lesson.id).done).length }; }
 
       function renderSidebar() {
-        const { d, t } = counts();
-        document.getElementById('overall-label').textContent = d + '/' + t;
-        document.getElementById('overall-bar').style.width =
-          (t ? (d / t) * 100 : 0) + '%';
-        const box = document.getElementById('modules-list');
-        box.innerHTML = CURRICULO.map((m) => {
-          const md = m.licoes.filter((l) => gp(l.id).done).length;
-          const isOpen = m.id === openMod;
-          return `<div class="module ${isOpen ? 'open' : ''}" data-mod="${m.id}">
-      <div class="module-head" data-tog="${m.id}">
-        <span class="chev">▶</span>
-        <b>${esc(m.titulo)}${m.novo ? '<span class="tag novo">NOVO</span>' : ''}</b>
-        <span class="cnt">${md}/${m.licoes.length}</span>
-      </div>
-      <div class="mod-bar"><div class="mod-bar-fill" style="width:${m.licoes.length ? (md / m.licoes.length) * 100 : 0}%"></div></div>
-      <div class="lesson-list">
-        ${m.licoes
-          .map((l) => {
-            const p = gp(l.id);
-            return `<div class="lesson-item ${p.done ? 'done' : ''} ${st.activeLessonId === l.id ? 'active' : ''} ${l.novo ? 'new-topic' : ''}" data-les="${l.id}">
-            <span class="chk">${p.done ? '✓' : ''}</span><span class="ltitle">${esc(l.titulo)}</span>
-          </div>`;
-          })
-          .join('')}
-      </div>
-    </div>`;
+        const { total, done } = totals();
+        document.getElementById('progress-label').textContent = `${done}/${total}`;
+        document.getElementById('progress-bar').style.width = `${total ? (done / total) * 100 : 0}%`;
+        document.getElementById('modules-list').innerHTML = CURRICULO.map((module) => {
+          const moduleLessons = allLessons().filter((lesson) => lesson.moduleId === module.id);
+          const moduleDone = moduleLessons.filter((lesson) => getProgress(lesson.id).done).length;
+          const open = module.id === state.openModuleId;
+          return `<section class="module ${open ? 'open' : ''}"><div class="module-head" data-module="${module.id}" role="button" tabindex="0" aria-expanded="${open}"><span class="chevron">▶</span><b>${esc(module.title)}</b><span class="count">${moduleDone}/${moduleLessons.length}</span></div><div class="module-bar"><div class="module-bar-fill" style="width:${moduleLessons.length ? (moduleDone / moduleLessons.length) * 100 : 0}%"></div></div><div class="lesson-list">${moduleLessons.map((lesson) => { const item = getProgress(lesson.id); return `<div class="lesson-item ${state.activeLessonId === lesson.id ? 'active' : ''} ${item.done ? 'done' : ''}" data-lesson="${lesson.id}"><span class="check">${item.done ? '✓' : ''}</span><span class="title">${esc(lesson.title)}</span></div>`; }).join('')}</div></section>`;
         }).join('');
-        box.querySelectorAll('[data-tog]').forEach((el) =>
-          el.addEventListener('click', () => {
-            openMod = openMod === el.dataset.tog ? null : el.dataset.tog;
-            renderSidebar();
-          })
-        );
-        box
-          .querySelectorAll('[data-les]')
-          .forEach((el) =>
-            el.addEventListener('click', () => openLesson(el.dataset.les))
-          );
+        document.querySelectorAll('[data-module]').forEach((element) => { element.addEventListener('click', () => toggleModule(element.dataset.module)); element.addEventListener('keydown', (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggleModule(element.dataset.module); } }); });
+        document.querySelectorAll('[data-lesson]').forEach((element) => element.addEventListener('click', () => openLesson(element.dataset.lesson)));
       }
 
-      document.getElementById('btn-continuar').addEventListener('click', () => {
-        const al = allLessons();
-        const nx = al.find((l) => !gp(l.id).done) || al[0];
-        if (nx) {
-          openMod = nx.moduloId;
-          openLesson(nx.id);
-        }
-      });
-
+      function toggleModule(id) { state.openModuleId = state.openModuleId === id ? null : id; renderSidebar(); }
       function renderIntro() {
-        document.getElementById('content-area').innerHTML = `
-    <h1>Zero → Automação de API</h1>
-    <div class="subtitle">Postman + Cypress com Restful-Booker e DummyJSON. v1.1.0</div>
-    <div class="intro-card">
-      <h3>Trilha Completa de Aulas</h3>
-      <p>Navegue pelos módulos na barra lateral esquerda para iniciar os estudos. O progresso é salvo automaticamente no seu navegador.</p>
-    </div>`;
+        document.getElementById('content').innerHTML = `<p class="eyebrow">Trilha progressiva · do básico ao avançado</p><h1>Testes de API sem pular etapas.</h1><p class="subtitle">Estude o conceito, veja um exemplo, pratique e confira o resultado esperado. O curso não chama serviços externos e salva apenas seu progresso neste navegador.</p><div class="module-intro"><span class="module-number">COMO ESTUDAR</span><h2>O fluxo de trabalho do QA de API</h2><p>Use a mesma sequência em qualquer API: primeiro leia o contrato, depois monte a chamada, valide o retorno e só então automatize a verificação.</p><ol class="flow"><li>Ler a documentação Swagger/OpenAPI.</li><li>Entender método, endpoint, parâmetros e respostas.</li><li>Criar a requisição no Postman.</li><li>Adicionar validações com JavaScript.</li><li>Executar e analisar o resultado.</li></ol></div><div class="roadmap">${CURRICULO.map((module) => `<div class="roadmap-item"><strong>${esc(module.title)}</strong><span>${esc(module.intro)}</span></div>`).join('')}</div>`;
       }
 
-      async function openLesson(id) {
-        st.activeLessonId = id;
-        const les = allLessons().find((l) => l.id === id);
-        if (!les) return;
-        renderSidebar();
-        const area = document.getElementById('content-area');
-        area.innerHTML = `
-    <div class="lesson-header">
-      <span class="badge ${les.moduloNovo || les.novo ? 'new' : ''}">${esc(les.moduloTitulo)}</span>
-    </div>
-    <h1>${esc(les.titulo)}</h1>
-    <div class="subtitle">${esc(les.desc)}</div>
-    <div id="lesson-body"></div>`;
-
-        if (!cache[id]) {
-          document.getElementById('lesson-body').innerHTML =
-            '<div class="loading"><div class="spinner"></div>Carregando aula...</div>';
-          try {
-            cache[id] = buildLessonLocally(les);
-            sc();
-          } catch (e) {
-            document.getElementById('lesson-body').innerHTML =
-              `<div class="error-box">Não foi possível carregar o conteúdo local desta aula. Verifique o currículo versionado e tente novamente.</div>`;
-            return;
-          }
-        }
-        renderBody(les, cache[id]);
+      function openLesson(id) {
+        const lesson = allLessons().find((item) => item.id === id); if (!lesson) return;
+        state.activeLessonId = id; state.openModuleId = lesson.moduleId; renderSidebar();
+        const item = getProgress(id);
+        document.getElementById('content').innerHTML = `<div class="lesson-header"><span class="badge">${esc(lesson.moduleTitle)}</span></div><h1>${esc(lesson.title)}</h1><p class="subtitle">Leia a explicação, tente o exercício e só depois marque a aula como concluída.</p><div class="card"><h3>Explicação</h3><p>${esc(lesson.concept)}</p></div><div class="card"><h3>Exemplo prático</h3><p>${esc(lesson.example)}</p>${lesson.code ? codeBlock(lesson.code, 'Exemplo') : ''}</div><div class="callout exercise"><h3>Exercício</h3><p>${esc(lesson.exercise)}</p></div><div class="callout expected"><h3>Resultado esperado</h3><p>${esc(lesson.expected)}</p></div><div class="card"><h3>Checklist de entendimento</h3><ul class="checklist">${lesson.checklist.map((text, index) => `<li class="${item.checklist[index] ? 'checked' : ''}" data-check="${index}"><span class="box"></span><span class="text">${esc(text)}</span></li>`).join('')}</ul></div><div class="actions"><button class="button ${item.done ? '' : 'primary'}" id="done-button" type="button">${item.done ? '✓ Aula concluída' : 'Marcar aula como concluída'}</button><button class="button" id="back-button" type="button">Voltar ao início da trilha</button></div>`;
+        document.querySelectorAll('[data-check]').forEach((element) => element.addEventListener('click', () => { item.checklist[Number(element.dataset.check)] = !item.checklist[Number(element.dataset.check)]; saveProgress(); openLesson(id); }));
+        document.getElementById('done-button').addEventListener('click', () => { item.done = !item.done; saveProgress(); renderSidebar(); openLesson(id); });
+        document.getElementById('back-button').addEventListener('click', () => { state.activeLessonId = null; renderIntro(); renderSidebar(); });
+        document.querySelectorAll('[data-copy]').forEach((button) => button.addEventListener('click', () => copyText(button.dataset.copy)));
       }
 
-      function codeWrap(title, code) {
-        const cid = 'copy-' + Math.random().toString(36).slice(2, 6);
-        return `<div class="code-wrap"><div class="code-title"><span class="code-label">${esc(title)}</span><button class="small" id="${cid}">copiar</button></div><div class="code-body">${esc(code)}</div></div>`;
-      }
+      function codeBlock(code, label) { const id = `code-${Math.random().toString(36).slice(2)}`; return `<div class="code-wrap"><div class="code-header"><span>${esc(label)}</span><button class="button small" type="button" data-copy="${id}">copiar</button></div><pre id="${id}">${esc(code)}</pre></div>`; }
+      async function copyText(id) { const element = document.getElementById(id); if (!element) return; try { await navigator.clipboard.writeText(element.textContent); } catch {} }
 
-      function renderBody(les, c) {
-        const box = document.getElementById('lesson-body');
-        if (!box) return;
-        const p = gp(les.id);
-        let html = '';
-        html += `<div class="card"><h3>🎯 Objetivo</h3><p>${esc(c.objetivo)}</p></div>`;
-        html += `<div class="card"><h3>🧠 Conceito</h3><p>${esc(c.conceito)}</p></div>`;
-        if (c.analogia)
-          html += `<div class="card"><h3>🌎 Analogia</h3><p>${esc(c.analogia)}</p></div>`;
-        html += `<div class="card"><h3>🔎 Como funciona</h3><p>${esc(c.comoFunciona)}</p></div>`;
-        if (c.exemploTecnico)
-          html += `<div class="card"><h3>💻 Exemplo técnico</h3>${codeWrap('exemplo', c.exemploTecnico)}</div>`;
-        if (c.exemploProfissional)
-          html += `<div class="card"><h3>🏢 No mercado</h3><p>${esc(c.exemploProfissional)}</p></div>`;
-        if (c.pratica && c.pratica.length)
-          html += `<div class="card"><h3>🛠️ Prática</h3><ol>${c.pratica.map((x) => `<li>${esc(x)}</li>`).join('')}</ol></div>`;
-        if (c.teste)
-          html += `<div class="callout teste"><h4>🔬 Como testar</h4><p>${esc(c.teste)}</p></div>`;
-        if (c.desafio)
-          html += `<div class="callout desafio"><h4>🧩 Desafio</h4><p>${esc(c.desafio)}</p></div>`;
-        if (c.resumo)
-          html += `<div class="card"><h3>📝 Resumo</h3><p>${esc(c.resumo)}</p></div>`;
-        if (c.checklist && c.checklist.length) {
-          html += `<div class="card"><h3>✅ Checklist</h3>`;
-          c.checklist.forEach((item, i) => {
-            const ck = !!p.checklist[i];
-            html += `<div class="checklist-item ${ck ? 'checked' : ''}" data-ci="${i}"><div class="box">${ck ? '✓' : ''}</div><span class="txt">${esc(item)}</span></div>`;
-          });
-          html += `</div>`;
-        }
-        html += `<div class="card"><h3>Seu nível</h3>
-    <div class="nivel-row">${NIVEL_EMOJI.map((e, i) => `<button class="nivel-dot ${p.nivel === i ? 'sel' : ''}" data-nv="${i}">${e}</button>`).join('')}</div>
-    <div class="nivel-lbl">${NIVEIS[p.nivel]}</div></div>`;
-        html += `<div class="row">
-    <button class="${p.done ? 'teal' : 'primary'}" id="btn-done">${p.done ? '✓ Concluída' : 'Marcar como concluída'}</button>
-  </div>`;
-        box.innerHTML = html;
-
-        box.querySelectorAll('[data-ci]').forEach((el) =>
-          el.addEventListener('click', () => {
-            const i = +el.dataset.ci;
-            p.checklist[i] = !p.checklist[i];
-            sp();
-            renderBody(les, c);
-          })
-        );
-        box.querySelectorAll('[data-nv]').forEach((el) =>
-          el.addEventListener('click', () => {
-            p.nivel = +el.dataset.nv;
-            sp();
-            renderBody(les, c);
-          })
-        );
-        document.getElementById('btn-done').addEventListener('click', () => {
-          p.done = !p.done;
-          sp();
-          renderSidebar();
-          renderBody(les, c);
-        });
-        box.querySelectorAll('.code-wrap button.small').forEach((btn) => {
-          btn.addEventListener('click', (e) => {
-            const pre = e.currentTarget
-              .closest('.code-wrap')
-              .querySelector('.code-body');
-            copyText(pre ? pre.textContent : '', e.currentTarget);
-          });
-        });
-      }
-
-      function copyText(txt, btn) {
-        if (navigator.clipboard?.writeText) {
-          navigator.clipboard.writeText(txt);
-        }
-      }
-
-      try {
-        if (window.self === window.top)
-          document.body.classList.add('standalone');
-      } catch {}
-      renderIntro();
-      renderSidebar();
+      document.getElementById('continue-button').addEventListener('click', () => { const next = allLessons().find((lesson) => !getProgress(lesson.id).done) || allLessons()[0]; if (next) openLesson(next.id); });
+      renderIntro(); renderSidebar();
     </script>
   </body>
 </html>
