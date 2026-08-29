@@ -125,14 +125,14 @@
 <p>Abra a <a href="https://petstore3.swagger.io/">documentação Swagger Petstore</a>, localize <code>GET /pet/{petId}</code> e execute:</p>
 <pre><code class="language-text">GET {{petstoreUrl}}/pet/1
 </code></pre>
-<p>Depois execute um id inexistente. O objetivo é comparar a resposta de sucesso e a resposta de erro conforme o contrato, registrando status, headers e body.</p>
+<p>Depois execute um id inexistente. O objetivo é comparar a resposta de sucesso e a resposta de erro conforme o contrato, registrando status, headers e body. Se o serviço responder 5xx ou estiver indisponível, registre isso como problema do ambiente/serviço e não como o erro funcional esperado do endpoint.</p>
 <h3>Swagger Petstore: criação, alteração e exclusão</h3>
 <p>As operações abaixo demonstram o ciclo completo documentado:</p>
 <pre><code class="language-text">POST   {{petstoreUrl}}/pet
 PUT    {{petstoreUrl}}/pet
 DELETE {{petstoreUrl}}/pet/1
 </code></pre>
-<p>Para POST e PUT, use o modelo de <code>Pet</code> exibido no Swagger. Para DELETE, confirme o id usado e valide o status documentado. Dados criados em um serviço público podem ser compartilhados com outros estudantes; use somente dados de treinamento.</p>
+<p>Para POST e PUT, use o modelo de <code>Pet</code> exibido no Swagger. Para DELETE, confirme o id usado e valide o status documentado. Dados criados em um serviço público podem ser compartilhados com outros estudantes; use somente dados de treinamento. Como a instância pública pode ficar instável, confirme sua disponibilidade antes de transformar <code>200</code> em uma expectativa rígida.</p>
 <h2>6. Testes de status e campo</h2>
 <p>No painel <strong>Tests</strong> da request, cole exatamente uma assertion por regra. O status e o campo são verificações diferentes:</p>
 <pre><code class="language-javascript">pm.test(&quot;Status deve ser 200&quot;, function () {

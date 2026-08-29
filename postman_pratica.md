@@ -114,7 +114,7 @@ Abra a [documentação Swagger Petstore](https://petstore3.swagger.io/), localiz
 GET {{petstoreUrl}}/pet/1
 ```
 
-Depois execute um id inexistente. O objetivo é comparar a resposta de sucesso e a resposta de erro conforme o contrato, registrando status, headers e body.
+Depois execute um id inexistente. O objetivo é comparar a resposta de sucesso e a resposta de erro conforme o contrato, registrando status, headers e body. Se o serviço responder 5xx ou estiver indisponível, registre isso como problema do ambiente/serviço e não como o erro funcional esperado do endpoint.
 
 ### Swagger Petstore: criação, alteração e exclusão
 
@@ -126,7 +126,7 @@ PUT    {{petstoreUrl}}/pet
 DELETE {{petstoreUrl}}/pet/1
 ```
 
-Para POST e PUT, use o modelo de `Pet` exibido no Swagger. Para DELETE, confirme o id usado e valide o status documentado. Dados criados em um serviço público podem ser compartilhados com outros estudantes; use somente dados de treinamento.
+Para POST e PUT, use o modelo de `Pet` exibido no Swagger. Para DELETE, confirme o id usado e valide o status documentado. Dados criados em um serviço público podem ser compartilhados com outros estudantes; use somente dados de treinamento. Como a instância pública pode ficar instável, confirme sua disponibilidade antes de transformar `200` em uma expectativa rígida.
 
 ## 6. Testes de status e campo
 

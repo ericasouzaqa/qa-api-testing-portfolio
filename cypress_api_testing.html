@@ -190,7 +190,7 @@ baseUrl: 'https://restcountries.com/v3.1'
   });
 });
 </code></pre>
-<p>Depois, crie um cenário de pet inexistente e um cenário de criação. Primeiro registre o status e o modelo esperado na documentação; somente depois escreva as assertions.</p>
+<p>Depois, crie um cenário de pet inexistente e um cenário de criação. Primeiro registre o status e o modelo esperado na documentação; somente depois escreva as assertions. Se a instância pública responder 5xx, trate como falha de disponibilidade do ambiente, não como o erro funcional esperado pelo teste.</p>
 <h2>10. Organização e execução</h2>
 <p>Mantenha cada <code>it</code> com uma intenção. Prefira comandos pequenos e independentes a um teste que faz consulta, criação, alteração e exclusão sem separar os resultados. Se houver dependência entre etapas, deixe os dados explícitos e limpe os recursos de teste quando a API permitir.</p>
 <p>Execute um arquivo específico enquanto desenvolve:</p>

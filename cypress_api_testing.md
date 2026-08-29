@@ -226,7 +226,7 @@ describe('Swagger Petstore', () => {
 });
 ```
 
-Depois, crie um cenário de pet inexistente e um cenário de criação. Primeiro registre o status e o modelo esperado na documentação; somente depois escreva as assertions.
+Depois, crie um cenário de pet inexistente e um cenário de criação. Primeiro registre o status e o modelo esperado na documentação; somente depois escreva as assertions. Se a instância pública responder 5xx, trate como falha de disponibilidade do ambiente, não como o erro funcional esperado pelo teste.
 
 ## 10. Organização e execução
 
