@@ -4,9 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Da Entrega ao Teste — Triagem para QA</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
   :root{
     --bg:#14181C; --surface:#1C2228; --surface-raised:#232A31; --line:#333B43;
@@ -159,7 +156,7 @@
 <div class="shell">
 <div class="app">
   <div class="stepper">
-    <div class="brand"><span class="dot"></span>Da Entrega ao Teste<button class="gear" id="btn-settings" title="Configurações">⚙️</button></div>
+    <div class="brand"><span class="dot"></span>Da Entrega ao Teste</div>
     <div class="step" data-step="1"><div class="num">1</div><div class="label"><b>Entrada</b><span>Cole ou anexe</span></div></div>
     <div class="step" data-step="2"><div class="num">2</div><div class="label"><b>Triagem</b><span>Um bloco por item</span></div></div>
     <div class="step" data-step="3"><div class="num">3</div><div class="label"><b>Cenários</b><span>Ambiente + Gherkin + código</span></div></div>
@@ -234,18 +231,18 @@
 
   </div>
 </div>
-<div class="footer-note">Esta ferramenta não se conecta a nenhum sistema ou API interna. As chamadas de IA vão direto do seu navegador para a API da Anthropic.</div>
+<div class="footer-note">Esta ferramenta funciona localmente e não se conecta a sistemas, APIs ou serviços de geração externos.</div>
 </div>
 
 <script>
-// Se a página não está dentro de um iframe (ex: aberta direto no navegador, GitHub Pages),
+// Se a página for aberta diretamente no navegador ou no GitHub Pages,
 // assume o layout de página própria: fundo preenchido, app centralizado, altura cheia.
 try{
   if(window.self === window.top){
     document.body.classList.add('standalone');
   }
 }catch(e){
-  // acesso a window.top bloqueado normalmente indica iframe de outra origem — mantém modo embutido
+  // acesso a window.top bloqueado indica um iframe — mantém o modo incorporado
 }
 
 const state = {
@@ -253,10 +250,8 @@ const state = {
   attachments: { pdf: null, images: [] },
   items: [],
   activeIndex: 0,
-  apiKey: ''
 };
 
-try{ state.apiKey = sessionStorage.getItem('anthropic_api_key') || ''; }catch(e){ state.apiKey = ''; }
 
 function showStage(n){
   ['1','2','3','4'].forEach(s=>{
@@ -277,38 +272,6 @@ function escapeHtml(str){
   return String(str).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
 
-// ---------- CONFIGURAÇÕES (chave de API) ----------
-
-document.getElementById('btn-settings').addEventListener('click', openSettingsModal);
-
-function openSettingsModal(){
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.innerHTML = `<div class="modal-card">
-    <h2>Configurações</h2>
-    <div class="modal-note">Dentro do Claude, isso funciona sem nenhuma chave. Se você publicar esta página fora do Claude (ex: GitHub Pages), cada pessoa que for usar precisa colar a própria chave de API da Anthropic abaixo — ela fica só neste navegador, nunca é enviada a nenhum lugar além da própria Anthropic. Gere uma em console.anthropic.com.</div>
-    <input type="password" id="api-key-input" placeholder="sk-ant-...">
-    <div class="modal-actions">
-      <button class="small ghost" id="clear-key">Remover chave</button>
-      <button class="small ghost" id="close-settings">Cancelar</button>
-      <button class="small primary" id="save-key">Salvar</button>
-    </div>
-  </div>`;
-  document.body.appendChild(overlay);
-  document.getElementById('api-key-input').value = state.apiKey;
-  document.getElementById('close-settings').addEventListener('click', ()=> overlay.remove());
-  document.getElementById('clear-key').addEventListener('click', ()=>{
-    state.apiKey = '';
-    try{ sessionStorage.removeItem('anthropic_api_key'); }catch(e){}
-    overlay.remove();
-  });
-  document.getElementById('save-key').addEventListener('click', ()=>{
-    const key = document.getElementById('api-key-input').value.trim();
-    state.apiKey = key;
-    try{ sessionStorage.setItem('anthropic_api_key', key); }catch(e){}
-    overlay.remove();
-  });
-}
 
 // ---------- ANEXOS ----------
 
@@ -382,45 +345,42 @@ function buildUserContent(promptText){
 
 // ---------- API ----------
 
-async function callClaude(systemPrompt, userPrompt){
-  const headers = { "Content-Type": "application/json" };
-  if(state.apiKey){
-    headers["x-api-key"] = state.apiKey;
-    headers["anthropic-version"] = "2023-06-01";
-    headers["anthropic-dangerous-direct-browser-access"] = "true";
+function localSource(value){
+  if(Array.isArray(value)) return value.map(block => block.text || '').join(' ');
+  return String(value || '');
+}
+
+function localItemFromPrompt(prompt){
+  const id = (String(prompt).match(/id="([^"]+)/) || [,'Item 1'])[1];
+  const title = (String(prompt).match(/título: "([^"]*)/) || [,'Item identificado'])[1];
+  return { id, title: title || 'Item identificado' };
+}
+
+function runLocalAnalysis(systemPrompt, userPrompt){
+  const source = localSource(userPrompt);
+  if(systemPrompt === IDENTIFICACAO_SYSTEM){
+    const lines = source.split(/\n+/).map(line => line.trim()).filter(Boolean);
+    const candidates = lines.filter(line => /^(pbi|us[-_ ]?\d+|os[-_ ]?\d+|item\s+\d+)/i.test(line));
+    const selected = candidates.length ? candidates : [lines[0] || 'Item sem título'];
+    return selected.slice(0, 20).map((line, index) => ({ id: (line.match(/^(pbi|us[-_ ]?\d+|os[-_ ]?\d+)/i) || [])[0] || 'Item ' + (index + 1), tituloOriginal: line.replace(/^(pbi|us[-_ ]?\d+|os[-_ ]?\d+)[:\-–]?\s*/i, '').slice(0, 80) || line.slice(0, 80) }));
   }
-  const response = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      model: "claude-sonnet-4-6",
-      max_tokens: 1000,
-      system: systemPrompt,
-      messages: [{ role: "user", content: userPrompt }]
-    })
-  });
-  if(!response.ok){
-    let detail = '';
-    try{ const errData = await response.json(); detail = errData?.error?.message || ''; }catch(e){}
-    if((response.status === 401 || response.status === 403) && !state.apiKey){
-      throw new Error("Chamada não autorizada. Se esta página está rodando fora do Claude (ex: GitHub Pages), adicione sua chave de API em ⚙️ Configurações.");
-    }
-    throw new Error("Falha na chamada da API (" + response.status + ")" + (detail ? ": " + detail : ""));
+  const item = localItemFromPrompt(source);
+  if(systemPrompt === DETAIL_SYSTEM){
+    return { tipo: 'outro', descricao: 'Item identificado na fonte original para análise manual.', criteriosAceite: ['Confirmar o comportamento descrito na fonte original.'], impactos: [], pontosAtencao: ['Validar o resultado diretamente com a fonte fornecida.'], dadosInsuficientes: ['A fonte não informa critérios detalhados; registrar o que faltar como GAP.'] };
   }
-  const data = await response.json();
-  const text = data.content.map(b => b.text || "").join("\n");
-  const truncated = data.stop_reason === "max_tokens";
-  try{
-    return extractJson(text);
-  }catch(e){
-    const err = new Error(
-      truncated
-        ? "A resposta foi cortada por limite de tamanho. Tente com um conteúdo menor ou detalhe menos itens de uma vez."
-        : "Resposta fora do formato esperado."
-    );
-    err.rawText = text;
-    throw err;
+  if(systemPrompt === AMBIENTE_SYSTEM){
+    return { titulo: 'Preparação local', prerequisitos: ['Fonte original disponível', 'Ambiente de teste definido'], passos: ['Reunir a fonte e os acessos explicitamente informados', 'Registrar qualquer ausência antes de iniciar o teste'], paraQuemPedir: 'Peça somente os acessos, dados e critérios que não estiverem na fonte.' };
   }
+  if(systemPrompt === CENARIOS_SYSTEM){
+    return { checklist: ['Conferir o comportamento descrito na fonte', 'Registrar evidência do resultado observado'], gherkin: [{ titulo: 'Comportamento informado na fonte', dado: 'A fonte original está disponível', quando: 'O fluxo descrito é executado', entao: 'O resultado observado é comparado com a fonte' }], pontosAtencao: ['Não assumir regras ausentes'], observacaoNaoObvia: 'A ausência de informação deve permanecer visível como GAP.', foraDaCobertura: ['Comportamentos não descritos na fonte'] };
+  }
+  if(systemPrompt === CYPRESS_SYSTEM || systemPrompt === POSTMAN_SYSTEM || systemPrompt === PERFORMANCE_SYSTEM){
+    return { aplicavel: false, motivo: 'A geração automática foi desativada para manter a aplicação independente de IA e serviços externos.', codigo: '', instrucoes: 'Use os cenários exibidos como base e escreva a automação no ambiente escolhido.' };
+  }
+  if(systemPrompt === MANUAL_SYSTEM){
+    return { titulo: item.title, avisoConteudoTecnico: 'Manual baseado somente nas informações disponíveis na fonte; lacunas devem ser confirmadas antes da publicação.', secoes: [{ heading: 'Visão geral', texto: 'Este item é apresentado conforme o conteúdo fornecido na fonte original.' }, { heading: 'Como usar', texto: 'Siga apenas os passos e comportamentos explicitamente descritos na fonte.' }, { heading: 'Limitações', texto: 'Informações ausentes, imagens ilegíveis e regras não comprovadas permanecem como GAP.' }] };
+  }
+  return {};
 }
 
 function extractJson(text){
@@ -494,7 +454,7 @@ async function runIdentification(userPrompt, withAttachments){
   loading.classList.remove('hidden');
   try{
     const content = withAttachments ? buildUserContent(userPrompt) : userPrompt;
-    const result = await callClaude(IDENTIFICACAO_SYSTEM, content);
+    const result = await runLocalAnalysis(IDENTIFICACAO_SYSTEM, content);
     const arr = Array.isArray(result) ? result : (result.items || [result]);
     state.items = arr.map((p, idx) => ({
       id: p.id || ('Item ' + (idx+1)),
@@ -555,7 +515,7 @@ async function loadItemDetail(item, feedbackText){
     const extra = feedbackText ? `\n\nAjuste pedido pelo QA para este item: ${feedbackText}` : '';
     const promptText = `Conteúdo original fornecido:\n${state.sourceText}\n\nDetalhe SOMENTE o item identificado como id="${item.id}" (título: "${item.tituloOriginal}"). Ignore os demais itens presentes no conteúdo.${extra}`;
     const content = buildUserContent(promptText);
-    const result = await callClaude(DETAIL_SYSTEM, content);
+    const result = await runLocalAnalysis(DETAIL_SYSTEM, content);
     item.tipo = result.tipo || 'outro';
     item.descricao = result.descricao || '';
     item.criteriosAceite = result.criteriosAceite || [];
@@ -717,7 +677,7 @@ async function loadStage3ForActive(){
     document.getElementById('ambiente-slot').innerHTML = '<div class="loading"><div class="spinner"></div>Preparando guia de ambiente...</div>';
     try{
       const prompt = `Item:\n${JSON.stringify({id:item.id, titulo:item.tituloOriginal, tipo:item.tipo, descricao:item.descricao, criteriosAceite:item.criteriosAceite, impactos:item.impactos})}`;
-      item.ambiente = await callClaude(AMBIENTE_SYSTEM, prompt);
+      item.ambiente = await runLocalAnalysis(AMBIENTE_SYSTEM, prompt);
     }catch(e){
       renderErrorBox('ambiente-slot', e, loadStage3ForActive);
       return;
@@ -729,7 +689,7 @@ async function loadStage3ForActive(){
     document.getElementById('cenarios-slot').innerHTML = '<div class="loading"><div class="spinner"></div>Gerando checklist e cenários...</div>';
     try{
       const prompt = `Item:\n${JSON.stringify({id:item.id, titulo:item.tituloOriginal, descricao:item.descricao, criteriosAceite:item.criteriosAceite, impactos:item.impactos})}`;
-      item.cenarios = await callClaude(CENARIOS_SYSTEM, prompt);
+      item.cenarios = await runLocalAnalysis(CENARIOS_SYSTEM, prompt);
     }catch(e){
       renderErrorBox('cenarios-slot', e, loadStage3ForActive);
       return;
@@ -819,7 +779,7 @@ function renderAutomacaoBlock(item){
       btn.disabled = true;
       try{
         const prompt = `Item:\n${JSON.stringify({id:item.id, titulo:item.tituloOriginal, descricao:item.descricao, criteriosAceite:item.criteriosAceite})}\n\nCenários Gherkin:\n${JSON.stringify(item.cenarios.gherkin||[])}`;
-        const result = await callClaude(type.system, prompt);
+        const result = await runLocalAnalysis(type.system, prompt);
         item.automacao[key] = result;
         btn.remove();
         renderAutomacaoResult(key, result);
@@ -906,7 +866,7 @@ async function loadStage4ForActive(){
     document.getElementById('manual-slot').innerHTML = '<div class="loading"><div class="spinner"></div>Escrevendo manual...</div>';
     try{
       const prompt = `Item:\n${JSON.stringify({id:item.id, titulo:item.tituloOriginal, descricao:item.descricao, criteriosAceite:item.criteriosAceite})}\n\nCenários de teste:\n${JSON.stringify(item.cenarios)}\n\nEscreva o manual do usuário.`;
-      item.manual = await callClaude(MANUAL_SYSTEM, prompt);
+      item.manual = await runLocalAnalysis(MANUAL_SYSTEM, prompt);
     }catch(e){
       renderErrorBox('manual-slot', e, loadStage4ForActive);
       return;

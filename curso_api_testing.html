@@ -4,11 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Do Zero à Automação de API — Postman + Cypress</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
     <style>
       :root {
         --bg: #14181c;
@@ -625,7 +620,6 @@
         <div class="sidebar">
           <div class="brand">
             <span class="dot"></span>Zero → Automação de API
-            <button class="gear" id="btn-settings">⚙️</button>
           </div>
           <div class="overall-progress">
             <div class="lbl">
@@ -984,7 +978,7 @@
       ];
       const NIVEL_EMOJI = ['🟢', '🔵', '🟡', '🟠', '🔴', '🟣'];
 
-      const st = { activeLessonId: null, apiKey: '' };
+      const st = { activeLessonId: null };
       function loadJ(k, fb) {
         try {
           const v = localStorage.getItem(k);
@@ -1000,9 +994,6 @@
       }
       let progress = loadJ('apiqacurso_progress_v110', {});
       let cache = loadJ('apiqacurso_content_v110', {});
-      try {
-        st.apiKey = sessionStorage.getItem('anthropic_api_key') || '';
-      } catch {}
 
       function gp(id) {
         if (!progress[id])
@@ -1040,37 +1031,6 @@
         );
       }
 
-      document.getElementById('btn-settings').addEventListener('click', () => {
-        const o = document.createElement('div');
-        o.className = 'modal-overlay';
-        o.innerHTML = `<div class="modal-card"><h2>Configurações</h2>
-    <div class="modal-note">Cole sua chave de API da Anthropic para gerar as aulas caso use fora do Claude (console.anthropic.com).</div>
-    <input type="password" id="aki" placeholder="sk-ant-...">
-    <div class="modal-actions">
-      <button class="small ghost" id="ck-clear">Remover</button>
-      <button class="small ghost" id="ck-close">Cancelar</button>
-      <button class="small primary" id="ck-save">Salvar</button>
-    </div></div>`;
-        document.body.appendChild(o);
-        document.getElementById('aki').value = st.apiKey;
-        document.getElementById('ck-close').onclick = () => o.remove();
-        document.getElementById('ck-clear').onclick = () => {
-          st.apiKey = '';
-          try {
-            sessionStorage.removeItem('anthropic_api_key');
-          } catch {}
-          o.remove();
-        };
-        document.getElementById('ck-save').onclick = () => {
-          const k = document.getElementById('aki').value.trim();
-          st.apiKey = k;
-          try {
-            sessionStorage.setItem('anthropic_api_key', k);
-          } catch {}
-          o.remove();
-        };
-      });
-
       const SYS_LESSON = `Você é um instrutor sênior de QA e Automação de Testes de API ensinando iniciantes do zero. Formato de resposta — JSON PURO, sem markdown:
 {
   "objetivo": "1 frase",
@@ -1086,45 +1046,20 @@
   "checklist": ["item 1", "item 2"]
 }`;
 
-      async function callClaude(sys, user) {
-        const hdrs = { 'Content-Type': 'application/json' };
-        if (st.apiKey) {
-          hdrs['x-api-key'] = st.apiKey;
-          hdrs['anthropic-version'] = '2023-06-01';
-          hdrs['anthropic-dangerous-direct-browser-access'] = 'true';
-        }
-        const res = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: hdrs,
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-6',
-            max_tokens: 1000,
-            system: sys,
-            messages: [{ role: 'user', content: user }],
-          }),
-        });
-        if (!res.ok) {
-          let d = '';
-          try {
-            const e = await res.json();
-            d = e?.error?.message || '';
-          } catch {}
-          throw new Error(
-            'Erro na API (' + res.status + ')' + (d ? ': ' + d : '')
-          );
-        }
-        const data = await res.json();
-        const txt = data.content.map((b) => b.text || '').join('\n');
-        try {
-          return JSON.parse(
-            txt
-              .replace(/```json/gi, '')
-              .replace(/```/g, '')
-              .trim()
-          );
-        } catch (e) {
-          throw new Error('Erro ao interpretar JSON.');
-        }
+      function buildLessonLocally(lesson) {
+        return {
+          objetivo: lesson.desc,
+          conceito: `${lesson.titulo} é estudado com exemplos e verificações locais, usando somente o conteúdo deste currículo.`,
+          analogia: 'Pense na aula como um roteiro de estudo: primeiro você entende, depois pratica e por fim confere o resultado.',
+          comoFunciona: 'Leia a explicação, observe o exemplo versionado e avance apenas quando conseguir explicar o que foi apresentado.',
+          exemploTecnico: `Exemplo relacionado ao tema: ${lesson.titulo}. Ajuste os valores ao contrato ou material que estiver estudando.`,
+          exemploProfissional: 'Em um projeto real, confirme a regra na documentação e registre a evidência antes de concluir o teste.',
+          pratica: ['Leia o objetivo da aula.', 'Anote o que ainda não está claro.', 'Compare sua resposta com a documentação disponível.'],
+          teste: 'Verifique se você consegue explicar o conceito e identificar o resultado esperado sem consultar uma fonte não versionada.',
+          desafio: `Descreva um exemplo próprio para o tema “${lesson.titulo}” e indique o que precisaria ser confirmado.`,
+          resumo: `A aula apresenta ${lesson.titulo.toLowerCase()} de forma progressiva e prática.`,
+          checklist: ['Entendi o conceito principal.', 'Consegui relacionar o exemplo ao tema.', 'Registrei dúvidas ou GAPs restantes.'],
+        };
       }
 
       let openMod = null;
@@ -1218,14 +1153,11 @@
           document.getElementById('lesson-body').innerHTML =
             '<div class="loading"><div class="spinner"></div>Carregando aula...</div>';
           try {
-            cache[id] = await callClaude(
-              SYS_LESSON,
-              `Módulo: ${les.moduloTitulo}\nAula: ${les.titulo}\nContexto: ${les.desc}`
-            );
+            cache[id] = buildLessonLocally(les);
             sc();
           } catch (e) {
             document.getElementById('lesson-body').innerHTML =
-              `<div class="error-box">Erro ao carregar aula. Certifique-se de configurar sua chave de API da Anthropic nas configurações ⚙️ caso esteja rodando totalmente fora do Claude.</div>`;
+              `<div class="error-box">Não foi possível carregar o conteúdo local desta aula. Verifique o currículo versionado e tente novamente.</div>`;
             return;
           }
         }
