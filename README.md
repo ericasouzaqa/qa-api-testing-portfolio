@@ -38,6 +38,14 @@ O fluxo de estudo usa a [documentação do Swagger Petstore](https://petstore3.s
 
 O projeto usa somente tecnologias que realmente fazem parte da solução: **HTML5, CSS3, JavaScript, Postman, Swagger/OpenAPI, Cypress, GitHub Pages e Windows Portable Launcher**. Postman e Cypress são ferramentas ensinadas nos laboratórios; não são dependências para abrir o site ou ler o material.
 
+## CI/CD
+
+O repositório possui dois workflows em `.github/workflows/`. O CI roda em Pull Requests para `main` e em pushes para `main`. Ele verifica os arquivos obrigatórios, a presença de `README.md` e `LICENSE`, a estrutura HTML, os links locais, os arquivos temporários/indevidos, a estrutura Web/Desktop e o formato do diff.
+
+O CD roda somente após o CI terminar com sucesso para a branch `main`. Nesse momento, ele publica a raiz estática com as actions oficiais do GitHub Pages. Não existe etapa de build com dependências: o artefato publicado é formado pelos arquivos HTML, CSS e JavaScript versionados no repositório.
+
+Se uma verificação crítica falhar, o CI interrompe o processo e o CD não publica aquela versão.
+
 ## Execução local
 
 Para testar a versão Web com um servidor estático opcional:
