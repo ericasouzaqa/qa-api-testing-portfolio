@@ -2,7 +2,9 @@
 
 Este repositório contém uma trilha local e progressiva para aprender testes de API REST. O conteúdo parte dos conceitos básicos e chega à automação com Postman, JavaScript e Cypress, sempre usando uma documentação real como ponto de partida.
 
-A [página inicial publicada](https://ericasouzaqa.github.io/qa-api-testing-portfolio/) apresenta o caminho de estudo. O conteúdo principal está nos próprios arquivos do projeto e não depende de inteligência artificial, API externa obrigatória, banco de dados, login, serviço pago, chave privada ou backend. A [versão Desktop para Windows](https://github.com/ericasouzaqa/qa-api-testing-portfolio/releases/latest) é um pacote portátil para leitura offline.
+**Web:** [GitHub Pages](https://ericasouzaqa.github.io/qa-api-testing-portfolio/) · **Desktop:** [baixar versão Windows](https://github.com/ericasouzaqa/qa-api-testing-portfolio/releases/download/v2.0.0/qa-api-testing-portfolio-windows.zip)
+
+A página Web apresenta o caminho de estudo. O conteúdo principal está nos próprios arquivos do projeto e não depende de inteligência artificial, API externa obrigatória, banco de dados, login, serviço pago, chave privada ou backend. A versão Desktop para Windows é um pacote portátil para leitura offline.
 
 ## Trilha de aprendizado
 
@@ -52,7 +54,7 @@ Depois, acesse `http://localhost:8000/`. Nenhum pacote ou etapa de build é nece
 
 ## Versão Desktop para Windows
 
-Baixe o arquivo `qa-api-testing-portfolio-windows.zip` na [Release mais recente](https://github.com/ericasouzaqa/qa-api-testing-portfolio/releases/latest), extraia a pasta e dê duplo clique em `QA-API-Testing-Portfolio.bat`. O launcher abre o `index.html` localmente; não há instalador, servidor ou configuração adicional. Os links para APIs públicas são referências de estudo e não impedem a leitura offline.
+Baixe o arquivo [`qa-api-testing-portfolio-windows.zip`](https://github.com/ericasouzaqa/qa-api-testing-portfolio/releases/download/v2.0.0/qa-api-testing-portfolio-windows.zip) na [Release mais recente](https://github.com/ericasouzaqa/qa-api-testing-portfolio/releases/latest), extraia a pasta e dê duplo clique em `QA-API-Testing-Portfolio.bat`. O launcher abre o `index.html` localmente; não há instalador, servidor ou configuração adicional. Os links para APIs públicas são referências de estudo e não impedem a leitura offline.
 
 ## Limites do projeto
 
