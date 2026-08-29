@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Laboratório prático de Cypress API Testing para testes de API e automação.">
+  <title>Laboratório prático de Cypress API Testing — QA</title>
+  <style>
+    :root { --bg:#10161a; --surface:#192229; --line:#33424a; --text:#f1efe8; --dim:#a7b1b4; --amber:#f1c652; --teal:#74ab98; }
+    * { box-sizing:border-box; } body { margin:0; background:var(--bg); color:var(--text); font:15px/1.7 system-ui,sans-serif; }
+    .page { width:min(940px,calc(100% - 36px)); margin:0 auto; padding:28px 0 64px; }
+    .back { color:var(--dim); font-size:13px; text-decoration:none; } .back:hover { color:var(--text); }
+    article { margin-top:24px; padding:clamp(22px,5vw,52px); border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+    h1,h2,h3 { line-height:1.2; } h1 { margin-top:0; color:var(--amber); font-size:clamp(28px,5vw,44px); } h2 { margin-top:38px; padding-top:14px; border-top:1px solid var(--line); font-size:25px; } h3 { margin-top:28px; font-size:18px; }
+    p,li { color:var(--dim); } strong { color:var(--text); } a { color:var(--amber); } code { padding:2px 5px; border-radius:4px; background:#0c1216; color:#d6e7df; font-family:Consolas,monospace; font-size:.92em; }
+    pre { overflow:auto; padding:16px; border:1px solid var(--line); border-radius:8px; background:#0c1216; color:#d6e7df; } pre code { padding:0; background:transparent; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; } th,td { padding:9px 10px; border:1px solid var(--line); text-align:left; vertical-align:top; } th { color:var(--text); background:#202c33; } td { color:var(--dim); }
+    blockquote { margin:18px 0; padding:10px 16px; border-left:3px solid var(--teal); background:#19332d; }
+  </style>
+</head>
+<body><div class="page"><a class="back" href="index.html">← Voltar ao portfólio de QA</a><article><h1>Laboratório prático de Cypress API Testing</h1>
+<p>Este guia mostra como transformar requests de API em testes versionados. O Cypress é opcional para quem está estudando; o portfólio continua funcionando como site estático e não precisa instalar Cypress para abrir o conteúdo.</p>
+<h2>1. Instalação</h2>
+<p>Em uma pasta separada para os exercícios, instale o Cypress como dependência de desenvolvimento:</p>
+<pre><code class="language-bash">mkdir qa-api-cypress
+cd qa-api-cypress
+npm init -y
+npm install cypress --save-dev
+npx cypress open
+</code></pre>
+<p>O comando <code>npx cypress open</code> cria a estrutura inicial quando necessário e abre a interface. Para executar sem interface, use:</p>
+<pre><code class="language-bash">npx cypress run
+</code></pre>
+<p>A instalação é feita somente no projeto de testes do aluno. Ela não é uma dependência obrigatória deste portfólio estático.</p>
+<h2>2. Configuração</h2>
+<p>Crie <code>cypress.config.js</code> na raiz. <code>baseUrl</code> evita repetir o domínio, mas não substitui a leitura da documentação da API:</p>
+<pre><code class="language-javascript">const { defineConfig } = require('cypress');
+
+module.exports = defineConfig({
+  e2e: {
+    baseUrl: 'https://jsonplaceholder.typicode.com',
+    video: false,
+  },
+});
+</code></pre>
+<p>Para outro serviço de treinamento, altere <code>baseUrl</code> conscientemente:</p>
+<pre><code class="language-javascript">// Swagger Petstore
+baseUrl: 'https://petstore3.swagger.io/api/v3'
+
+// REST Countries não usa a mesma raiz de recursos
+baseUrl: 'https://restcountries.com/v3.1'
+</code></pre>
+<p>Não coloque tokens, senhas ou chaves privadas no arquivo de configuração. Use variáveis de ambiente ou o mecanismo de segredo do pipeline quando a API realmente exigir autenticação.</p>
+<h2>3. Estrutura dos testes</h2>
+<p>Uma estrutura pequena e legível é suficiente para começar:</p>
+<pre><code class="language-text">qa-api-cypress/
+├── cypress/
+│   ├── e2e/
+│   │   └── api/
+│   │       ├── jsonplaceholder.cy.js
+│   │       ├── petstore.cy.js
+│   │       └── negative.cy.js
+│   ├── fixtures/
+│   │   └── pet.json
+│   └── support/
+├── cypress.config.js
+└── package.json
+</code></pre>
+<p>Separe os testes por recurso ou comportamento. Nomeie o <code>describe</code> com a API e o <code>it</code> com o resultado esperado. O teste deve indicar método, endpoint, dados relevantes e assertions.</p>
+<h2>4. Primeira chamada com <code>cy.request()</code></h2>
+<p>O exemplo abaixo consulta usuários simulados no JSONPlaceholder. A ideia é a mesma do fluxo solicitado: entender o contrato, criar a request, validar e analisar.</p>
+<pre><code class="language-javascript">describe('Teste de API', () =&gt; {
+  it('Deve consultar usuários', () =&gt; {
+    cy.request('GET', '/users')
+      .then((response) =&gt; {
+        expect(response.status).to.eq(200);
+        expect(response.body).to.be.an('array');
+        expect(response.body[0]).to.have.property('name');
+      });
+  });
+});
+</code></pre>
+<p>Se a API não tiver sido configurada com <code>baseUrl</code>, use a URL completa. O status <code>200</code> sozinho não prova que a resposta está correta; valide também estrutura, tipos e campos relevantes.</p>
+<h2>5. Cenários de consulta</h2>
+<h3>JSONPlaceholder: post existente</h3>
+<pre><code class="language-javascript">it('consulta um post existente', () =&gt; {
+  cy.request('GET', '/posts/1').then((response) =&gt; {
+    expect(response.status).to.eq(200);
+    expect(response.body).to.include.keys('userId', 'id', 'title', 'body');
+    expect(response.body.id).to.eq(1);
+  });
+});
+</code></pre>
+<h3>REST Countries: país</h3>
+<pre><code class="language-javascript">describe('REST Countries', () =&gt; {
+  it('consulta o Brasil', () =&gt; {
+    cy.request('GET', 'https://restcountries.com/v3.1/name/brazil')
+      .then((response) =&gt; {
+        expect(response.status).to.eq(200);
+        expect(response.body).to.be.an('array').and.not.be.empty;
+        expect(response.body[0].name.common).to.be.a('string');
+        expect(response.body[0].cca2).to.eq('BR');
+      });
+  });
+});
+</code></pre>
+<h2>6. Criação, alteração e exclusão</h2>
+<p>O JSONPlaceholder simula escrita e devolve respostas de treino. Os dados não devem ser tratados como persistidos sem confirmar a documentação.</p>
+<pre><code class="language-javascript">describe('JSONPlaceholder - ciclo de post', () =&gt; {
+  it('cria um post', () =&gt; {
+    cy.request('POST', '/posts', {
+      title: 'estudo de API',
+      body: 'conteúdo de teste',
+      userId: 1,
+    }).then((response) =&gt; {
+      expect(response.status).to.eq(201);
+      expect(response.body).to.have.property('id');
+    });
+  });
+
+  it('altera um post', () =&gt; {
+    cy.request('PUT', '/posts/1', {
+      id: 1,
+      title: 'título alterado',
+      body: 'conteúdo alterado',
+      userId: 1,
+    }).then((response) =&gt; {
+      expect(response.status).to.eq(200);
+      expect(response.body.title).to.eq('título alterado');
+    });
+  });
+
+  it('exclui um post', () =&gt; {
+    cy.request('DELETE', '/posts/1').then((response) =&gt; {
+      expect(response.status).to.eq(200);
+    });
+  });
+});
+</code></pre>
+<p>Para o Swagger Petstore, consulte os modelos na documentação antes de enviar <code>POST /pet</code> e <code>PUT /pet</code>. Não copie um body de outra API: o contrato de cada serviço define campos e tipos.</p>
+<h2>7. Validação de erro e usuário inexistente</h2>
+<p>Para um erro esperado, use <code>failOnStatusCode: false</code> para receber a resposta e validar o status no teste:</p>
+<pre><code class="language-javascript">it('trata usuário inexistente', () =&gt; {
+  cy.request({
+    method: 'GET',
+    url: 'https://reqres.in/api/users/9999',
+    failOnStatusCode: false,
+  }).then((response) =&gt; {
+    expect([404, 400]).to.include(response.status);
+  });
+});
+</code></pre>
+<p>Escolha o status pela documentação ou pelo comportamento confirmado do serviço. Não transforme qualquer <code>4xx</code> em sucesso de forma genérica; o cenário deve dizer qual erro é esperado.</p>
+<h2>8. Autenticação quando disponível</h2>
+<p>O Reqres oferece um fluxo de login de treinamento, mas pode exigir uma chave de acesso conforme a política atual do serviço. Nunca versionar essa chave. O padrão de captura e uso do token é:</p>
+<pre><code class="language-javascript">it('captura token de login', () =&gt; {
+  cy.request({
+    method: 'POST',
+    url: 'https://reqres.in/api/login',
+    body: {
+      email: 'eve.holt@reqres.in',
+      password: 'pistol',
+    },
+    failOnStatusCode: false,
+  }).then((response) =&gt; {
+    expect([200, 401, 403]).to.include(response.status);
+    if (response.status === 200) {
+      expect(response.body).to.have.property('token');
+    }
+  });
+});
+</code></pre>
+<p>Se a API documentar Bearer token, envie-o por header sem escrever o valor no código:</p>
+<pre><code class="language-javascript">cy.request({
+  method: 'GET',
+  url: '/users',
+  headers: { Authorization: `Bearer ${Cypress.env('apiToken')}` },
+});
+</code></pre>
+<h2>9. Swagger Petstore no Cypress</h2>
+<p>Abra o <a href="https://petstore3.swagger.io/">Swagger Petstore</a>, leia <code>GET /pet/{petId}</code> e implemente o teste:</p>
+<pre><code class="language-javascript">describe('Swagger Petstore', () =&gt; {
+  it('consulta um pet', () =&gt; {
+    cy.request('GET', 'https://petstore3.swagger.io/api/v3/pet/1')
+      .then((response) =&gt; {
+        expect(response.status).to.eq(200);
+        expect(response.body).to.have.property('id');
+        expect(response.body.name).to.be.a('string');
+      });
+  });
+});
+</code></pre>
+<p>Depois, crie um cenário de pet inexistente e um cenário de criação. Primeiro registre o status e o modelo esperado na documentação; somente depois escreva as assertions.</p>
+<h2>10. Organização e execução</h2>
+<p>Mantenha cada <code>it</code> com uma intenção. Prefira comandos pequenos e independentes a um teste que faz consulta, criação, alteração e exclusão sem separar os resultados. Se houver dependência entre etapas, deixe os dados explícitos e limpe os recursos de teste quando a API permitir.</p>
+<p>Execute um arquivo específico enquanto desenvolve:</p>
+<pre><code class="language-bash">npx cypress run --spec 'cypress/e2e/api/jsonplaceholder.cy.js'
+</code></pre>
+<p>Depois execute a suíte inteira:</p>
+<pre><code class="language-bash">npx cypress run --spec 'cypress/e2e/api/**/*.cy.js'
+</code></pre>
+<p>O resultado esperado é uma lista de testes com nome, status e mensagem de assertion. Ao investigar uma falha, confira contrato, endpoint, dados, ambiente e resposta antes de alterar o teste.</p>
+<h2>Exercício final</h2>
+<p>Crie uma suíte com consulta, criação, alteração, exclusão, erro e usuário inexistente. Use JSONPlaceholder para CRUD, REST Countries para validação de lista, Swagger Petstore para contrato e Reqres para o cenário de login quando o serviço estiver disponível. Execute um arquivo específico e depois toda a pasta <code>api</code>.</p>
+<p>Ao concluir, você deve conseguir explicar por que cada request existe, qual status e campo são esperados, como a resposta negativa é tratada e como outra pessoa executaria os testes.</p>
+<h2>Referências</h2>
+<ul>
+<li><a href="https://docs.cypress.io/">Cypress Documentation</a></li>
+<li><a href="https://jsonplaceholder.typicode.com/">JSONPlaceholder</a></li>
+<li><a href="https://reqres.in/">Reqres</a></li>
+<li><a href="https://restcountries.com/">REST Countries</a></li>
+<li><a href="https://petstore3.swagger.io/">Swagger Petstore</a></li>
+</ul></article></div></body>
+</html>

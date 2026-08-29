@@ -23,7 +23,7 @@ Cada aula apresenta uma explicação simples, um exemplo prático, código quand
 
 A trilha usa o mesmo fluxo do início ao fim: ler a documentação Swagger/OpenAPI, entender método, endpoint, parâmetros e respostas, criar a requisição, adicionar validações, executar o teste e analisar o resultado. O exemplo principal usa a documentação pública do [Swagger Petstore](https://petstore3.swagger.io/), com o endpoint `GET /pet/{petId}`.
 
-O [guia de Postman](postman.md) amplia os exemplos de requests, Collections, variáveis, autenticação, scripts, assertions, cenários negativos e chaining. O [glossário de QA e API](terms.md) serve como consulta rápida para os termos usados nas aulas.
+O [laboratório prático de Postman](postman_pratica.md) ensina instalação, Collections, Environments, variáveis, organização de requests, scripts JavaScript, assertions, captura de token, cenários positivos e negativos e Collection Runner. O [laboratório de Cypress API](cypress_api_testing.md) ensina instalação opcional, configuração, estrutura, `cy.request()`, validações, cenários CRUD, erros e execução em lote. O [guia de Postman](postman.md) amplia os exemplos de requests e o [glossário de QA e API](terms.md) serve como consulta rápida para os termos usados nas aulas.
 
 ## Arquivos principais
 
@@ -31,6 +31,10 @@ O [guia de Postman](postman.md) amplia os exemplos de requests, Collections, var
 | --- | --- |
 | [`index.html`](index.html) | Página inicial do portfólio, com o mapa de conceitos e o fluxo de teste. |
 | [`curso_api_testing.html`](curso_api_testing.html) | Aplicação local da trilha de oito módulos, com aulas, exercícios e progresso. |
+| [`postman_pratica.html`](postman_pratica.html) | Laboratório de Postman com Collection, Environment, scripts, token e Runner. |
+| [`cypress_api_testing.html`](cypress_api_testing.html) | Laboratório de Cypress com `cy.request()`, cenários e execução. |
+| [`postman_pratica.md`](postman_pratica.md) | Fonte editável do laboratório de Postman. |
+| [`cypress_api_testing.md`](cypress_api_testing.md) | Fonte editável do laboratório de Cypress. |
 | [`postman.md`](postman.md) | Material complementar de Postman e JavaScript. |
 | [`terms.md`](terms.md) | Glossário de API, HTTP, QA e automação. |
 

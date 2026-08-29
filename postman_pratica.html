@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Laboratório prático de Postman para testes de API e automação.">
+  <title>Laboratório prático de Postman — QA</title>
+  <style>
+    :root { --bg:#10161a; --surface:#192229; --line:#33424a; --text:#f1efe8; --dim:#a7b1b4; --amber:#f1c652; --teal:#74ab98; }
+    * { box-sizing:border-box; } body { margin:0; background:var(--bg); color:var(--text); font:15px/1.7 system-ui,sans-serif; }
+    .page { width:min(940px,calc(100% - 36px)); margin:0 auto; padding:28px 0 64px; }
+    .back { color:var(--dim); font-size:13px; text-decoration:none; } .back:hover { color:var(--text); }
+    article { margin-top:24px; padding:clamp(22px,5vw,52px); border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+    h1,h2,h3 { line-height:1.2; } h1 { margin-top:0; color:var(--amber); font-size:clamp(28px,5vw,44px); } h2 { margin-top:38px; padding-top:14px; border-top:1px solid var(--line); font-size:25px; } h3 { margin-top:28px; font-size:18px; }
+    p,li { color:var(--dim); } strong { color:var(--text); } a { color:var(--amber); } code { padding:2px 5px; border-radius:4px; background:#0c1216; color:#d6e7df; font-family:Consolas,monospace; font-size:.92em; }
+    pre { overflow:auto; padding:16px; border:1px solid var(--line); border-radius:8px; background:#0c1216; color:#d6e7df; } pre code { padding:0; background:transparent; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; } th,td { padding:9px 10px; border:1px solid var(--line); text-align:left; vertical-align:top; } th { color:var(--text); background:#202c33; } td { color:var(--dim); }
+    blockquote { margin:18px 0; padding:10px 16px; border-left:3px solid var(--teal); background:#19332d; }
+  </style>
+</head>
+<body><div class="page"><a class="back" href="index.html">← Voltar ao portfólio de QA</a><article><h1>Laboratório prático de Postman</h1>
+<p>Este guia acompanha a trilha do curso e transforma os conceitos em uma pequena suíte de testes. O objetivo é aprender a preparar, executar e analisar requests sem depender de backend próprio, banco de dados ou serviço pago.</p>
+<h2>1. Instalação</h2>
+<p>Baixe o aplicativo desktop na <a href="https://www.postman.com/downloads/">página oficial de download do Postman</a>. Depois de instalar, é possível usar o aplicativo sem criar uma conta para os exercícios locais. A conta e a sincronização são opcionais; o laboratório não depende delas.</p>
+<p>Abra o Postman e crie um workspace local chamado <code>QA API - Estudos</code>. Use nomes que expliquem a intenção do teste. Uma request chamada <code>GET - Usuário existente</code> é mais útil do que uma request chamada apenas <code>Request 1</code>.</p>
+<h2>2. Criar uma Collection</h2>
+<p>Na barra lateral, selecione <strong>Collections</strong>, crie <code>API Training - QA</code> e organize as requests por API ou por fluxo. Uma organização simples é:</p>
+<pre><code class="language-text">API Training - QA/
+├── JSONPlaceholder/
+│   ├── GET - Post existente
+│   ├── POST - Criar post
+│   ├── PUT - Alterar post
+│   └── DELETE - Excluir post
+├── REST Countries/
+│   └── GET - Buscar país
+├── Reqres/
+│   ├── GET - Usuários
+│   └── POST - Login (token)
+└── Swagger Petstore/
+    ├── GET - Pet existente
+    ├── POST - Criar pet
+    ├── PUT - Alterar pet
+    ├── DELETE - Excluir pet
+    └── GET - Pet inexistente
+</code></pre>
+<p>Cada request deve ter método, URL, parâmetros, headers, body e testes coerentes com a documentação ou com o comportamento conhecido da API de treinamento.</p>
+<h2>3. Criar um Environment</h2>
+<p>Abra <strong>Environments</strong>, crie <code>Treinamento - público</code> e adicione variáveis. Preencha o valor inicial com os endereços abaixo e deixe o valor atual sem credenciais reais quando a API não exigir autenticação.</p>
+<table>
+<thead>
+<tr>
+<th>Variável</th>
+<th>Valor inicial</th>
+<th>Uso</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>jsonplaceholderUrl</code></td>
+<td><code>https://jsonplaceholder.typicode.com</code></td>
+<td>Posts e usuários simulados.</td>
+</tr>
+<tr>
+<td><code>reqresUrl</code></td>
+<td><code>https://reqres.in</code></td>
+<td>Usuários e login de treinamento.</td>
+</tr>
+<tr>
+<td><code>countriesUrl</code></td>
+<td><code>https://restcountries.com/v3.1</code></td>
+<td>Consulta de países.</td>
+</tr>
+<tr>
+<td><code>petstoreUrl</code></td>
+<td><code>https://petstore3.swagger.io/api/v3</code></td>
+<td>API documentada com Swagger/OpenAPI.</td>
+</tr>
+<tr>
+<td><code>petId</code></td>
+<td><code>1</code></td>
+<td>Identificador de estudo.</td>
+</tr>
+<tr>
+<td><code>token</code></td>
+<td>vazio</td>
+<td>Será preenchido somente durante um exercício de autenticação.</td>
+</tr>
+</tbody>
+</table>
+<p>Selecione o Environment no canto superior direito. Use <code>{{jsonplaceholderUrl}}/posts/1</code> na URL, em vez de repetir o endereço completo em todas as requests.</p>
+<h2>4. Variáveis e escopo</h2>
+<p>Uma variável de Environment é adequada para valores que mudam entre ambientes. Uma variável de Collection é útil para compartilhar um id criado entre requests da mesma suíte. Uma variável local serve apenas para a execução atual.</p>
+<p>Não salve senhas, tokens reais ou chaves de API em uma Collection versionada. Se uma API exigir chave, crie uma variável local ou use o mecanismo de segredo do seu ambiente de trabalho.</p>
+<h2>5. Requests e cenários CRUD</h2>
+<h3>JSONPlaceholder: consulta</h3>
+<p><code>GET {{jsonplaceholderUrl}}/posts/1</code></p>
+<p>O JSONPlaceholder é uma API de treinamento. A consulta deve retornar status <code>200</code> e um objeto com <code>userId</code>, <code>id</code>, <code>title</code> e <code>body</code>.</p>
+<h3>JSONPlaceholder: criação</h3>
+<p><code>POST {{jsonplaceholderUrl}}/posts</code></p>
+<p>Header: <code>Content-Type: application/json</code></p>
+<pre><code class="language-json">{
+  &quot;title&quot;: &quot;estudo de API&quot;,
+  &quot;body&quot;: &quot;post criado no exercício&quot;,
+  &quot;userId&quot;: 1
+}
+</code></pre>
+<p>Espere <code>201</code> e valide que a resposta contém um <code>id</code>. A API simula a criação; não trate o recurso como persistido para um exercício posterior sem confirmar a documentação.</p>
+<h3>JSONPlaceholder: alteração</h3>
+<p><code>PUT {{jsonplaceholderUrl}}/posts/1</code></p>
+<pre><code class="language-json">{
+  &quot;id&quot;: 1,
+  &quot;title&quot;: &quot;título alterado&quot;,
+  &quot;body&quot;: &quot;conteúdo alterado&quot;,
+  &quot;userId&quot;: 1
+}
+</code></pre>
+<p>Espere <code>200</code> e confirme que os campos enviados aparecem na resposta.</p>
+<h3>JSONPlaceholder: exclusão</h3>
+<p><code>DELETE {{jsonplaceholderUrl}}/posts/1</code></p>
+<p>Espere <code>200</code> ou o status descrito na documentação da API utilizada. Registre o status recebido; não invente uma expectativa só porque outra API usa <code>204</code>.</p>
+<h3>REST Countries: consulta</h3>
+<p><code>GET {{countriesUrl}}/name/brazil</code></p>
+<p>Valide status <code>200</code>, uma lista no body e a presença de <code>name.common</code> e <code>cca2</code>. Esse cenário é uma boa prática para validar estrutura de resposta, não apenas status.</p>
+<h3>Swagger Petstore: consulta e erro</h3>
+<p>Abra a <a href="https://petstore3.swagger.io/">documentação Swagger Petstore</a>, localize <code>GET /pet/{petId}</code> e execute:</p>
+<pre><code class="language-text">GET {{petstoreUrl}}/pet/1
+</code></pre>
+<p>Depois execute um id inexistente. O objetivo é comparar a resposta de sucesso e a resposta de erro conforme o contrato, registrando status, headers e body.</p>
+<h3>Swagger Petstore: criação, alteração e exclusão</h3>
+<p>As operações abaixo demonstram o ciclo completo documentado:</p>
+<pre><code class="language-text">POST   {{petstoreUrl}}/pet
+PUT    {{petstoreUrl}}/pet
+DELETE {{petstoreUrl}}/pet/1
+</code></pre>
+<p>Para POST e PUT, use o modelo de <code>Pet</code> exibido no Swagger. Para DELETE, confirme o id usado e valide o status documentado. Dados criados em um serviço público podem ser compartilhados com outros estudantes; use somente dados de treinamento.</p>
+<h2>6. Testes de status e campo</h2>
+<p>No painel <strong>Tests</strong> da request, cole exatamente uma assertion por regra. O status e o campo são verificações diferentes:</p>
+<pre><code class="language-javascript">pm.test(&quot;Status deve ser 200&quot;, function () {
+    pm.response.to.have.status(200);
+});
+
+pm.test(&quot;Resposta possui campo esperado&quot;, function () {
+    const body = pm.response.json();
+    pm.expect(body).to.have.property(&quot;name&quot;);
+});
+</code></pre>
+<p>Para JSONPlaceholder, o campo pode ser <code>title</code> em vez de <code>name</code>:</p>
+<pre><code class="language-javascript">pm.test(&quot;Post possui title&quot;, function () {
+    const body = pm.response.json();
+    pm.expect(body).to.have.property(&quot;title&quot;);
+    pm.expect(body.title).to.be.a(&quot;string&quot;);
+});
+</code></pre>
+<p>Para REST Countries, a resposta é uma lista:</p>
+<pre><code class="language-javascript">pm.test(&quot;País retornado possui código&quot;, function () {
+    const countries = pm.response.json();
+    pm.expect(countries).to.be.an(&quot;array&quot;).that.is.not.empty;
+    pm.expect(countries[0].cca2).to.be.a(&quot;string&quot;);
+});
+</code></pre>
+<h2>7. Testes positivos e negativos</h2>
+<p>Um teste positivo confirma o caminho esperado: um id válido retorna o recurso, um POST válido retorna criação e uma busca de país conhecido retorna uma lista. Um teste negativo envia uma condição inválida ou inexistente: id que não existe, body incompleto, método não permitido ou credencial ausente.</p>
+<p>O status negativo precisa vir do contrato. Uma forma segura de testar respostas de erro sem fazer o Postman marcar a request como falha de transporte é desativar <strong>Settings → General → Request → HTTP status codes</strong> somente quando necessário ou usar a opção de execução que permite respostas de erro. O teste deve continuar verificando o status esperado:</p>
+<pre><code class="language-javascript">pm.test(&quot;Usuário inexistente retorna erro documentado&quot;, function () {
+    pm.expect([404, 400]).to.include(pm.response.code);
+});
+</code></pre>
+<p>Não transforme qualquer erro em sucesso. O teste só passa se o código recebido fizer parte da expectativa do cenário.</p>
+<h2>8. Captura de token</h2>
+<p>Quando uma API de treinamento oferecer login, use um endpoint documentado. O Reqres possui o fluxo <code>POST /api/login</code>; a política de acesso pode exigir uma chave de teste e pode mudar, então confira a documentação atual antes de executar. Nunca coloque uma chave ou senha real no arquivo.</p>
+<p>Body de exemplo do exercício:</p>
+<pre><code class="language-json">{
+  &quot;email&quot;: &quot;eve.holt@reqres.in&quot;,
+  &quot;password&quot;: &quot;pistol&quot;
+}
+</code></pre>
+<p>No <strong>Tests</strong> do login, capture o token somente se a resposta tiver o campo:</p>
+<pre><code class="language-javascript">pm.test(&quot;Login retorna token&quot;, function () {
+    pm.response.to.have.status(200);
+    const body = pm.response.json();
+    pm.expect(body).to.have.property(&quot;token&quot;);
+    pm.environment.set(&quot;token&quot;, body.token);
+});
+</code></pre>
+<p>Na request seguinte, use <code>Authorization: Bearer {{token}}</code> somente se a documentação do endpoint exigir Bearer token. O objetivo é entender o encadeamento, não contornar autenticação.</p>
+<h2>9. Collection Runner</h2>
+<p>Abra a Collection, selecione <strong>Run</strong>, escolha o Environment e marque as requests que formam um fluxo. Comece com uma execução pequena: consulta, criação, alteração, exclusão e cenário de erro. Defina iterações e, se houver dados variados, carregue um CSV ou JSON de treino sem segredos.</p>
+<p>Acompanhe total de requests, testes aprovados, falhas, duração e console. Uma execução em lote útil responde: qual request falhou, qual assertion falhou, qual status foi recebido e qual evidência deve ser investigada.</p>
+<p>Para um CSV simples:</p>
+<pre><code class="language-csv">petId,country
+1,brazil
+2,canada
+</code></pre>
+<p>Use <code>{{petId}}</code> e <code>{{country}}</code> nas requests. Antes de rodar várias iterações, confirme que o cenário não altera dados compartilhados de forma irreversível.</p>
+<h2>10. Exercício final</h2>
+<p>Monte uma Collection com seis requests: consulta de recurso, criação, alteração, exclusão, usuário inexistente e login quando disponível. Adicione pelo menos uma assertion de status e uma de body em cada request. Execute a Collection Runner com duas iterações e registre o resultado.</p>
+<p>O resultado esperado é uma execução reproduzível, com variáveis separadas, requests nomeadas, testes que explicam a regra e relatório que diferencia falha de API, falha de dado e falha de configuração.</p>
+<h2>Referências</h2>
+<ul>
+<li><a href="https://learning.postman.com/">Postman Learning Center</a></li>
+<li><a href="https://jsonplaceholder.typicode.com/">JSONPlaceholder</a></li>
+<li><a href="https://reqres.in/">Reqres</a></li>
+<li><a href="https://restcountries.com/">REST Countries</a></li>
+<li><a href="https://petstore3.swagger.io/">Swagger Petstore</a></li>
+</ul></article></div></body>
+</html>
