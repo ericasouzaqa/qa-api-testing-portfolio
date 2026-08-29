@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Glossário de QA e API para testes de API e automação.">
+  <title>Glossário de QA e API — QA</title>
+  <style>
+    :root { --bg:#10161a; --surface:#192229; --line:#33424a; --text:#f1efe8; --dim:#a7b1b4; --amber:#f1c652; --teal:#74ab98; }
+    * { box-sizing:border-box; } body { margin:0; background:var(--bg); color:var(--text); font:15px/1.7 system-ui,sans-serif; }
+    .page { width:min(940px,calc(100% - 36px)); margin:0 auto; padding:28px 0 64px; }
+    .back { color:var(--dim); font-size:13px; text-decoration:none; } .back:hover { color:var(--text); }
+    article { margin-top:24px; padding:clamp(22px,5vw,52px); border:1px solid var(--line); border-radius:12px; background:var(--surface); }
+    h1,h2,h3 { line-height:1.2; } h1 { margin-top:0; color:var(--amber); font-size:clamp(28px,5vw,44px); } h2 { margin-top:38px; padding-top:14px; border-top:1px solid var(--line); font-size:25px; } h3 { margin-top:28px; font-size:18px; }
+    p,li { color:var(--dim); } strong { color:var(--text); } a { color:var(--amber); } code { padding:2px 5px; border-radius:4px; background:#0c1216; color:#d6e7df; font-family:Consolas,monospace; font-size:.92em; }
+    pre { overflow:auto; padding:16px; border:1px solid var(--line); border-radius:8px; background:#0c1216; color:#d6e7df; } pre code { padding:0; background:transparent; }
+    table { width:100%; border-collapse:collapse; margin:16px 0; } th,td { padding:9px 10px; border:1px solid var(--line); text-align:left; vertical-align:top; } th { color:var(--text); background:#202c33; } td { color:var(--dim); }
+    blockquote { margin:18px 0; padding:10px 16px; border-left:3px solid var(--teal); background:#19332d; }
+  </style>
+</head>
+<body><div class="page"><a class="back" href="index.html">← Voltar ao portfólio de QA</a><article><h1>Termos de API e QA</h1>
+<p>Dicionário de consulta rápida sobre API, HTTP, Postman e testes de software.</p>
+<hr />
+<h1>1. Fundamentos de API</h1>
+<h3>API</h3>
+<p>Application Programming Interface.</p>
+<p>Conjunto de regras que permite a comunicação entre sistemas ou componentes.</p>
+<h3>API REST</h3>
+<p>Estilo arquitetural utilizado para construção de serviços web utilizando recursos e conceitos do protocolo HTTP.</p>
+<h3>Endpoint</h3>
+<p>Endereço utilizado para acessar uma operação ou recurso de uma API.</p>
+<p>Exemplo:</p>
+<pre><code class="language-text">GET /users
+</code></pre>
+<h3>Recurso</h3>
+<p>Elemento ou entidade manipulada pela API.</p>
+<p>Exemplos:</p>
+<pre><code class="language-text">/users
+/products
+/orders
+</code></pre>
+<h3>URI</h3>
+<p>Identificador utilizado para identificar um recurso.</p>
+<h3>JSON</h3>
+<p>Formato de dados frequentemente utilizado na comunicação entre APIs.</p>
+<pre><code class="language-json">{
+  &quot;name&quot;: &quot;Erica&quot;,
+  &quot;email&quot;: &quot;erica@email.com&quot;
+}
+</code></pre>
+<hr />
+<h1>2. HTTP</h1>
+<h3>HTTP</h3>
+<p>Protocolo utilizado para comunicação entre clientes e servidores.</p>
+<h3>GET</h3>
+<p>Utilizado normalmente para consultar dados.</p>
+<h3>POST</h3>
+<p>Utilizado normalmente para criar recursos ou enviar dados para processamento.</p>
+<h3>PUT</h3>
+<p>Utilizado normalmente para substituir ou atualizar um recurso.</p>
+<h3>PATCH</h3>
+<p>Utilizado normalmente para atualizar parcialmente um recurso.</p>
+<h3>DELETE</h3>
+<p>Utilizado normalmente para remover um recurso.</p>
+<h3>HEAD</h3>
+<p>Solicita informações semelhantes às de uma requisição GET, mas sem o conteúdo do Response Body.</p>
+<h3>OPTIONS</h3>
+<p>Permite consultar as opções ou métodos suportados por um recurso.</p>
+<hr />
+<h1>3. Request</h1>
+<h3>Request</h3>
+<p>Requisição enviada pelo cliente para a API.</p>
+<p>Pode conter:</p>
+<ul>
+<li>método;</li>
+<li>URL;</li>
+<li>parâmetros;</li>
+<li>headers;</li>
+<li>autenticação;</li>
+<li>body.</li>
+</ul>
+<h3>Request Body</h3>
+<p>Dados enviados no corpo da requisição.</p>
+<h3>Query Parameter</h3>
+<p>Parâmetro enviado na URL.</p>
+<pre><code class="language-text">/users?status=active
+</code></pre>
+<h3>Path Parameter</h3>
+<p>Valor utilizado como parte do caminho do recurso.</p>
+<pre><code class="language-text">/users/123
+</code></pre>
+<h3>Header</h3>
+<p>Informação enviada no cabeçalho da requisição ou resposta.</p>
+<pre><code class="language-text">Content-Type: application/json
+</code></pre>
+<hr />
+<h1>4. Response</h1>
+<h3>Response</h3>
+<p>Resposta enviada pela API após o processamento de uma requisição.</p>
+<p>Pode conter:</p>
+<ul>
+<li>Status Code;</li>
+<li>Headers;</li>
+<li>Body.</li>
+</ul>
+<h3>Response Body</h3>
+<p>Conteúdo retornado pela API.</p>
+<h3>Response Header</h3>
+<p>Informações adicionais enviadas nos cabeçalhos da resposta.</p>
+<hr />
+<h1>5. Status Codes</h1>
+<h2>2xx — Sucesso</h2>
+<h3>200 OK</h3>
+<p>Requisição processada com sucesso.</p>
+<h3>201 Created</h3>
+<p>Recurso criado com sucesso.</p>
+<h3>202 Accepted</h3>
+<p>Requisição aceita para processamento.</p>
+<h3>204 No Content</h3>
+<p>Requisição processada com sucesso sem conteúdo no Response Body.</p>
+<h2>3xx — Redirecionamento</h2>
+<p>Indica que são necessárias ações adicionais para completar a requisição.</p>
+<h2>4xx — Erro do cliente</h2>
+<h3>400 Bad Request</h3>
+<p>Requisição inválida.</p>
+<h3>401 Unauthorized</h3>
+<p>A requisição não possui autenticação válida ou adequada.</p>
+<h3>403 Forbidden</h3>
+<p>O servidor entendeu a requisição, mas não permite a operação solicitada.</p>
+<h3>404 Not Found</h3>
+<p>Recurso não encontrado.</p>
+<h3>405 Method Not Allowed</h3>
+<p>Método HTTP não permitido para o recurso.</p>
+<h3>409 Conflict</h3>
+<p>Conflito com o estado atual do recurso.</p>
+<h3>422 Unprocessable Content</h3>
+<p>A requisição é compreensível, mas os dados não podem ser processados.</p>
+<h3>429 Too Many Requests</h3>
+<p>Limite de requisições excedido.</p>
+<h2>5xx — Erro do servidor</h2>
+<h3>500 Internal Server Error</h3>
+<p>Erro interno do servidor.</p>
+<h3>502 Bad Gateway</h3>
+<p>Resposta inválida recebida por um gateway ou proxy.</p>
+<h3>503 Service Unavailable</h3>
+<p>Serviço temporariamente indisponível.</p>
+<h3>504 Gateway Timeout</h3>
+<p>O gateway ou proxy não recebeu uma resposta dentro do tempo esperado.</p>
+<hr />
+<h1>6. Autenticação e autorização</h1>
+<h3>Authentication</h3>
+<p>Processo utilizado para verificar a identidade de quem realiza uma requisição.</p>
+<h3>Authorization</h3>
+<p>Processo utilizado para determinar quais ações uma identidade autenticada pode executar.</p>
+<h3>API Key</h3>
+<p>Chave utilizada para identificação ou autorização de acesso a uma API.</p>
+<h3>Bearer Token</h3>
+<p>Token enviado normalmente no header <code>Authorization</code>.</p>
+<pre><code class="language-text">Authorization: Bearer &lt;token&gt;
+</code></pre>
+<h3>Basic Authentication</h3>
+<p>Método de autenticação baseado em usuário e senha.</p>
+<hr />
+<h1>7. Postman</h1>
+<h3>Postman</h3>
+<p>Ferramenta utilizada para criar, enviar, organizar e testar requisições de APIs. O Postman suporta diferentes protocolos, incluindo HTTP.</p>
+<h3>Collection</h3>
+<p>Conjunto organizado de requisições.</p>
+<p>Collections também podem conter scripts, variáveis, autenticação, exemplos e testes.</p>
+<h3>Environment</h3>
+<p>Conjunto de variáveis utilizado para representar configurações de determinado ambiente.</p>
+<h3>Variable</h3>
+<p>Valor reutilizável em requisições, scripts ou ambientes.</p>
+<h3>Collection Runner</h3>
+<p>Recurso utilizado para executar requisições de uma Collection.</p>
+<h3>Script</h3>
+<p>Código JavaScript utilizado para adicionar lógica, preparar requisições ou validar respostas.</p>
+<h3>Teste no Postman</h3>
+<p>Validação automatizada executada após uma requisição.</p>
+<p>Exemplo:</p>
+<pre><code class="language-javascript">pm.test(&quot;Status esperado&quot;, function () {
+    pm.response.to.have.status(200);
+});
+</code></pre>
+<hr />
+<h1>8. Testes de API</h1>
+<h3>Teste de API</h3>
+<p>Processo de verificar se uma API funciona conforme o comportamento esperado.</p>
+<h3>Teste positivo</h3>
+<p>Utiliza dados válidos e condições esperadas.</p>
+<h3>Teste negativo</h3>
+<p>Utiliza dados inválidos ou condições que devem ser tratadas pela aplicação.</p>
+<h3>Teste funcional</h3>
+<p>Verifica se uma funcionalidade executa conforme os requisitos.</p>
+<h3>Teste de integração</h3>
+<p>Verifica a comunicação entre componentes, serviços ou sistemas.</p>
+<h3>Teste de regressão</h3>
+<p>Verifica se alterações não introduziram problemas em funcionalidades existentes.</p>
+<h3>Teste ponta a ponta</h3>
+<p>Valida um fluxo completo envolvendo diferentes componentes.</p>
+<h3>Teste de contrato</h3>
+<p>Verifica se a comunicação entre sistemas segue o contrato definido para a API.</p>
+<h3>Teste de desempenho</h3>
+<p>Avalia o comportamento da API sob diferentes condições de carga.</p>
+<hr />
+<h1>9. Integração</h1>
+<h3>Integração</h3>
+<p>Comunicação entre componentes ou sistemas.</p>
+<pre><code class="language-text">Frontend
+   ↓
+API
+   ↓
+Serviço externo
+   ↓
+Banco de dados
+</code></pre>
+<h3>Webhook</h3>
+<p>Mecanismo pelo qual um sistema envia uma notificação para outro quando determinado evento ocorre.</p>
+<h3>Timeout</h3>
+<p>Situação em que uma operação não recebe resposta dentro do período esperado.</p>
+<h3>Retry</h3>
+<p>Nova tentativa de executar uma operação após uma falha.</p>
+<h3>Idempotência</h3>
+<p>Propriedade na qual repetir determinada operação produz o mesmo efeito final, quando aplicável.</p>
+<hr />
+<h1>10. Documentação de API</h1>
+<h3>Swagger</h3>
+<p>Ferramentas e interfaces associadas ao ecossistema OpenAPI, frequentemente utilizadas para documentar e explorar APIs.</p>
+<h3>OpenAPI</h3>
+<p>Especificação utilizada para descrever APIs HTTP, incluindo operações, parâmetros, respostas e outros elementos do contrato.</p>
+<h3>Contrato da API</h3>
+<p>Definição do comportamento esperado da interface entre sistemas.</p>
+<hr />
+<h1>11. Conceitos de QA</h1>
+<h3>Cenário de teste</h3>
+<p>Situação definida para verificar determinado comportamento.</p>
+<h3>Caso de teste</h3>
+<p>Conjunto de condições, dados, passos e resultados esperados utilizados para validar uma funcionalidade.</p>
+<h3>Resultado esperado</h3>
+<p>Comportamento que deveria ocorrer.</p>
+<h3>Resultado obtido</h3>
+<p>Comportamento observado durante o teste.</p>
+<h3>Evidência</h3>
+<p>Registro utilizado para demonstrar o resultado da execução.</p>
+<p>Exemplos:</p>
+<ul>
+<li>Request;</li>
+<li>Response;</li>
+<li>log;</li>
+<li>captura de tela;</li>
+<li>vídeo;</li>
+<li>relatório.</li>
+</ul>
+<h3>Caso de borda</h3>
+<p>Cenário próximo aos limites definidos por uma regra.</p>
+<p>Exemplo:</p>
+<pre><code class="language-text">Limite: 160 caracteres
+
+159 → válido
+160 → válido
+161 → verificar comportamento esperado
+</code></pre>
+<hr />
+<h1>12. Automação</h1>
+<h3>Automação de testes</h3>
+<p>Uso de ferramentas e scripts para executar validações automaticamente.</p>
+<h3>CI</h3>
+<p>Continuous Integration.</p>
+<p>Prática de integrar alterações frequentemente e executar verificações automatizadas.</p>
+<h3>CD</h3>
+<p>Continuous Delivery ou Continuous Deployment, dependendo do contexto.</p>
+<h3>Pipeline</h3>
+<p>Sequência automatizada de etapas como build, teste e entrega.</p>
+<h3>GitHub Actions</h3>
+<p>Recurso do GitHub utilizado para automatizar workflows, incluindo execução de testes.</p>
+<hr />
+<h1>13. Boas práticas</h1>
+<h3>Validação de Request</h3>
+<p>Verifique se o cliente envia exatamente os dados esperados.</p>
+<h3>Validação de Response</h3>
+<p>Valide:</p>
+<ul>
+<li>Status Code;</li>
+<li>estrutura;</li>
+<li>campos;</li>
+<li>valores;</li>
+<li>tipos;</li>
+<li>regras de negócio.</li>
+</ul>
+<h3>Cenários negativos</h3>
+<p>Teste:</p>
+<ul>
+<li>dados inválidos;</li>
+<li>dados ausentes;</li>
+<li>valores limite;</li>
+<li>autenticação inválida;</li>
+<li>recursos inexistentes;</li>
+<li>métodos não permitidos.</li>
+</ul>
+<h3>Dados sensíveis</h3>
+<p>Não versionar:</p>
+<ul>
+<li>senhas;</li>
+<li>tokens;</li>
+<li>chaves;</li>
+<li>credenciais;</li>
+<li>informações pessoais reais.</li>
+</ul>
+<h3>Reutilização</h3>
+<p>Utilize Collections, variáveis e scripts para reduzir repetição.</p>
+<h3>Regressão</h3>
+<p>Execute novamente os testes impactados por alterações.</p>
+<hr />
+<h1>14. Checklist rápido</h1>
+<pre><code class="language-text">[ ] Endpoint correto
+[ ] Método HTTP correto
+[ ] Parâmetros corretos
+[ ] Headers corretos
+[ ] Autenticação válida
+[ ] Body correto
+[ ] Status Code esperado
+[ ] Response Body correto
+[ ] Regras de negócio validadas
+[ ] Cenários negativos executados
+[ ] Evidências registradas
+[ ] Dados sensíveis protegidos
+[ ] Regressão considerada
+</code></pre></article></div></body>
+</html>
