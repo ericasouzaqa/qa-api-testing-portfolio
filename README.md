@@ -1,61 +1,68 @@
-# Portfólio de QA — testes de API e automação
+# QA API Testing Portfolio
 
-Este repositório contém uma trilha local e progressiva para aprender testes de API REST. O conteúdo parte dos conceitos básicos e chega à automação com Postman, JavaScript e Cypress, sempre usando uma documentação real como ponto de partida.
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-online-2ea44f?logo=github)](https://ericasouzaqa.github.io/qa-api-testing-portfolio/)
+[![Windows Desktop](https://img.shields.io/badge/Windows-portable-0078D6?logo=windows)](https://github.com/ericasouzaqa/qa-api-testing-portfolio/releases/latest)
+[![API Testing](https://img.shields.io/badge/QA-API%20Testing-6b7280)](https://github.com/ericasouzaqa/qa-api-testing-portfolio)
+[![Postman](https://img.shields.io/badge/Postman-labs-ff6c37?logo=postman)](postman_pratica.html)
+[![Cypress](https://img.shields.io/badge/Cypress-API%20testing-69d3a7?logo=cypress)](cypress_api_testing.html)
+[![Release](https://img.shields.io/github/v/release/ericasouzaqa/qa-api-testing-portfolio)](https://github.com/ericasouzaqa/qa-api-testing-portfolio/releases/latest)
+[![License](https://img.shields.io/github/license/ericasouzaqa/qa-api-testing-portfolio)](LICENSE)
 
-**Web:** [GitHub Pages](https://ericasouzaqa.github.io/qa-api-testing-portfolio/) · **Desktop:** [baixar versão Windows](https://github.com/ericasouzaqa/qa-api-testing-portfolio/releases/download/v2.0.0/qa-api-testing-portfolio-windows.zip)
+Portfólio prático de QA para testes de API com Postman, JavaScript, Swagger/OpenAPI e Cypress. O projeto ensina uma pessoa iniciante a ler um contrato, criar uma request, adicionar validações, executar o teste e analisar o resultado.
 
-A página Web apresenta o caminho de estudo. O conteúdo principal está nos próprios arquivos do projeto e não depende de inteligência artificial, API externa obrigatória, banco de dados, login, serviço pago, chave privada ou backend. A versão Desktop para Windows é um pacote portátil para leitura offline.
+O conteúdo é local e funciona como site estático. Não há backend, banco de dados, login, serviço pago, inteligência artificial ou chave privada obrigatória. A execução offline usa os mesmos arquivos HTML da versão Web.
 
-## Trilha de aprendizado
+## Acesso ao projeto
 
-| Módulo | Conteúdo |
+### Versão Web
+
+Acesse o [GitHub Pages](https://ericasouzaqa.github.io/qa-api-testing-portfolio/). Não é necessário instalar nada: a aplicação abre diretamente em um navegador moderno e usa apenas HTML, CSS e JavaScript.
+
+### Versão Desktop para Windows
+
+Baixe [`qa-api-testing-portfolio-windows.zip`](https://github.com/ericasouzaqa/qa-api-testing-portfolio/releases/download/v2.0.0/qa-api-testing-portfolio-windows.zip) na [Release v2.0.0](https://github.com/ericasouzaqa/qa-api-testing-portfolio/releases/tag/v2.0.0). Extraia o ZIP e dê duplo clique em `QA-API-Testing-Portfolio.bat`. O launcher abre `app/index.html` localmente; não exige Node.js, servidor ou configuração adicional.
+
+## Conteúdo disponível
+
+| Parte | O que demonstra |
 | --- | --- |
-| 01 - Fundamentos de API | API, cliente, servidor, request, response e JSON. |
-| 02 - HTTP e REST | Métodos HTTP, CRUD, status codes, headers e autenticação. |
-| 03 - Postman | Requests, Collections, environments e variáveis. |
-| 04 - JavaScript no Postman | Assertions, scripts, variáveis e request chaining. |
-| 05 - Swagger/OpenAPI | Leitura de documentação, endpoints, parâmetros, modelos e respostas. |
-| 06 - Cypress API Testing | `cy.request()`, assertions e cenários negativos em código. |
-| 07 - Automação de Testes | Priorização, organização, execução e evidências. |
-| 08 - Boas Práticas de QA | Contrato, risco, manutenção, regressão e proteção de dados. |
+| Trilha de oito módulos | Fundamentos de API, HTTP/REST, Postman, JavaScript, Swagger/OpenAPI, Cypress, automação e boas práticas de QA. |
+| Laboratório de Postman | Instalação, Collection, Environment, variáveis, organização, assertions, scripts, token, testes positivos/negativos e Collection Runner. |
+| Laboratório de Cypress | Instalação opcional, configuração, estrutura, `cy.request()`, validações, CRUD, erros, autenticação e execução em lote. |
+| APIs de treinamento | JSONPlaceholder, Reqres, REST Countries e Swagger Petstore. |
+| Glossário | Termos de HTTP, REST, status codes, Postman, QA e automação. |
 
-Cada aula apresenta uma explicação simples, um exemplo prático, código quando necessário, um exercício, o resultado esperado e um checklist de entendimento. O aluno pode avançar manualmente ou usar o botão de continuidade; o progresso fica salvo no `localStorage` deste navegador.
+O fluxo de estudo usa a [documentação do Swagger Petstore](https://petstore3.swagger.io/) como exemplo real: localizar `GET /pet/{petId}`, entender método e parâmetros, criar a request, validar a resposta e analisar o resultado. Serviços públicos podem ficar indisponíveis; isso deve ser registrado como problema do ambiente, não confundido com falha funcional esperada.
 
-## Fluxo de teste ensinado
+## Tecnologias utilizadas
 
-A trilha usa o mesmo fluxo do início ao fim: ler a documentação Swagger/OpenAPI, entender método, endpoint, parâmetros e respostas, criar a requisição, adicionar validações, executar o teste e analisar o resultado. O exemplo principal usa a documentação pública do [Swagger Petstore](https://petstore3.swagger.io/), com o endpoint `GET /pet/{petId}`.
-
-O [laboratório prático de Postman](postman_pratica.md) ensina instalação, Collections, Environments, variáveis, organização de requests, scripts JavaScript, assertions, captura de token, cenários positivos e negativos e Collection Runner. O [laboratório de Cypress API](cypress_api_testing.md) ensina instalação opcional, configuração, estrutura, `cy.request()`, validações, cenários CRUD, erros e execução em lote. O [guia de Postman](postman.md) amplia os exemplos de requests e o [glossário de QA e API](terms.md) serve como consulta rápida para os termos usados nas aulas.
-
-## Arquivos principais
-
-| Arquivo | Finalidade |
-| --- | --- |
-| [`index.html`](index.html) | Página inicial do portfólio, com o mapa de conceitos e o fluxo de teste. |
-| [`curso_api_testing.html`](curso_api_testing.html) | Aplicação local da trilha de oito módulos, com aulas, exercícios e progresso. |
-| [`postman_pratica.html`](postman_pratica.html) | Laboratório de Postman com Collection, Environment, scripts, token e Runner. |
-| [`cypress_api_testing.html`](cypress_api_testing.html) | Laboratório de Cypress com `cy.request()`, cenários e execução. |
-| [`postman_pratica.md`](postman_pratica.md) | Fonte editável do laboratório de Postman. |
-| [`cypress_api_testing.md`](cypress_api_testing.md) | Fonte editável do laboratório de Cypress. |
-| [`postman.md`](postman.md) | Material complementar de Postman e JavaScript. |
-| [`terms.html`](terms.html) | Glossário de API, HTTP, QA e automação em HTML. |
-| [`terms.md`](terms.md) | Fonte editável do glossário. |
-| [`desktop/QA-API-Testing-Portfolio.bat`](desktop/QA-API-Testing-Portfolio.bat) | Launcher simples para abrir a versão offline no Windows. |
+O projeto usa somente tecnologias que realmente fazem parte da solução: **HTML5, CSS3, JavaScript, Postman, Swagger/OpenAPI, Cypress, GitHub Pages e Windows Portable Launcher**. Postman e Cypress são ferramentas ensinadas nos laboratórios; não são dependências para abrir o site ou ler o material.
 
 ## Execução local
 
-As páginas usam somente HTML, CSS e JavaScript. Para abrir a cópia local com as mesmas condições de uma hospedagem estática, execute um servidor na raiz:
+Para testar a versão Web com um servidor estático opcional:
 
 ```bash
 python3 -m http.server 8000
 ```
 
-Depois, acesse `http://localhost:8000/`. Nenhum pacote ou etapa de build é necessário.
+Depois, acesse `http://localhost:8000/`. Para leitura offline no Windows, use o launcher do pacote Desktop.
 
-## Versão Desktop para Windows
+## Contribuição
 
-Baixe o arquivo [`qa-api-testing-portfolio-windows.zip`](https://github.com/ericasouzaqa/qa-api-testing-portfolio/releases/download/v2.0.0/qa-api-testing-portfolio-windows.zip) na [Release mais recente](https://github.com/ericasouzaqa/qa-api-testing-portfolio/releases/latest), extraia a pasta e dê duplo clique em `QA-API-Testing-Portfolio.bat`. O launcher abre o `index.html` localmente; não há instalador, servidor ou configuração adicional. Os links para APIs públicas são referências de estudo e não impedem a leitura offline.
+Para propor uma melhoria, faça um fork, crie uma branch, altere o conteúdo, valide os links e os arquivos HTML, registre um commit e abra um Pull Request:
 
-## Limites do projeto
+```bash
+git checkout -b melhoria-conteudo
+# edite os arquivos
+python3 -m http.server 8000
+git add .
+git commit -m "Melhora exemplos de testes de API"
+git push origin melhoria-conteudo
+```
 
-Os exemplos são exercícios de estudo. Antes de executar uma request em outro ambiente, confirme a documentação, a autorização de acesso e os dados permitidos. Um teste automatizado não substitui a análise da regra de negócio nem a investigação da causa de uma falha. Nunca versionar senhas, tokens, chaves, credenciais ou dados pessoais reais.
+O Pull Request deve explicar o objetivo da alteração, os arquivos envolvidos e como a validação foi feita. Não inclua tokens, senhas, chaves, credenciais ou dados pessoais reais.
+
+## Licença
+
+Este projeto é distribuído sob a [licença MIT](LICENSE).
